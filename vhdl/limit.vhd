@@ -16,10 +16,12 @@ entity limit is
         
         din         : in  STD_LOGIC_VECTOR ((DATA_WIDTH * NUM_COLS)-1 downto 0);
         valid_in    : in  STD_LOGIC;
+        done_in     : in  STD_LOGIC;
         
         dout        : out STD_LOGIC_VECTOR ((DATA_WIDTH * NUM_COLS)-1 downto 0);
         valid_out   : out STD_LOGIC;
-        limit_hit   : out STD_LOGIC
+        limit_hit   : out STD_LOGIC;
+        done_out    : out STD_LOGIC
     );
 end limit;
 
@@ -34,25 +36,31 @@ begin
             valid_out <= '0';
             dout <= (others => '0');
             internal_hit <= '0';
+            done_out <= '0';
         elsif rising_edge(clk) then
             if active = '0' then
                 -- Comportamento Transparente: Repassa dados instantaneamente e não bloqueia nada
                 dout <= din;
                 valid_out <= valid_in;
                 internal_hit <= '0';
+                done_out <= done_in;
             else
                 -- Passagem de dados pelo pipeline
                 dout <= din;
                 
-                if valid_in = '1' and internal_hit = '0' then
+                if valid_in = '1' and internal_hit = '0' and done_in = '0' then
                     count_value <= count_value + 1;
                     valid_out <= '1';
                     
                     if count_value + 1 >= unsigned(limit_value) then
                         internal_hit <= '1';
+                        done_out <= done_in; -- O limite acabou de bater, o próximo ciclo receberá done=1
+                    else
+                        done_out <= done_in;
                     end if;
                 else
                     valid_out <= '0';
+                    done_out <= done_in or internal_hit; -- Repassa o done ou força o done se o limit foi atingido
                 end if;
             end if;
         end if;

@@ -84,9 +84,11 @@ architecture Behavioral of pipeline is
             active      : in  STD_LOGIC;
             din         : in  STD_LOGIC_VECTOR ((DATA_WIDTH * NUM_COLS)-1 downto 0);
             valid_in    : in  STD_LOGIC;
+            done_in     : in  STD_LOGIC;
             dout        : out STD_LOGIC_VECTOR ((DATA_WIDTH * NUM_COLS)-1 downto 0);
             valid_out   : out STD_LOGIC;
-            limit_hit   : out STD_LOGIC
+            limit_hit   : out STD_LOGIC;
+            done_out    : out STD_LOGIC
         );
     end component;
 
@@ -121,10 +123,15 @@ architecture Behavioral of pipeline is
 
     -- Sinais dos estágios do Pipeline Verdadeiro
     signal where_stage_dout : STD_LOGIC_VECTOR ((DATA_WIDTH * NUM_COLS)-1 downto 0);
+    signal stage1_done      : STD_LOGIC := '0';
+    
     signal limit_stage_dout : STD_LOGIC_VECTOR ((DATA_WIDTH * NUM_COLS)-1 downto 0);
     signal limit_valid_out  : STD_LOGIC;
     signal limit_hit        : STD_LOGIC;
+    signal limit_done_out   : STD_LOGIC;
     signal limit_cols       : col_array_t;
+
+    signal stage3_done      : STD_LOGIC := '0';
 
     -- Sinais para WHERE
     signal where_inst     : matriz_inst_tipo := (others => (others => '0'));
@@ -142,7 +149,6 @@ architecture Behavioral of pipeline is
     -- Sinais de fluxo e status
     signal where_valid_and : STD_LOGIC;
     signal count_valid_in  : STD_LOGIC;
-    signal internal_done   : STD_LOGIC;
     
     signal count_din       : STD_LOGIC_VECTOR(DATA_WIDTH-1 downto 0);
 
@@ -150,13 +156,10 @@ begin
 
     full <= fifo_full;
     empty <= fifo_empty;
-    done <= internal_done;
+    done <= stage3_done;
 
-    -- O sistema finaliza quando o limite é atingido (se houver limite) ou a FIFO de entrada esvazia
-    internal_done <= '1' when ((limit_active = '1' and limit_hit = '1') or fifo_empty = '1') else '0';
-
-    -- Trava a leitura da FIFO enquanto estiver carregando instrução ou se já terminou
-    fifo_rd_en <= '1' when (load_inst = '0' and internal_done = '0') else '0';
+    -- Trava a leitura da FIFO enquanto estiver carregando instrução ou se já terminou na fonte (ou limit travou)
+    fifo_rd_en <= '1' when (load_inst = '0' and fifo_empty = '0' and limit_hit = '0') else '0';
 
     -- Instruction Fetcher Process
     process(clk, rst)
@@ -245,13 +248,15 @@ begin
         where_valid_and <= all_valid;
     end process;
 
-    -- Pipeline Stage 1: Alinha o dado original com a validação do WHERE
+    -- Pipeline Stage 1: Alinha o dado original com a validação do WHERE e rastreia o EOF
     process(clk, rst)
     begin
         if rst = '1' then
             where_stage_dout <= (others => '0');
+            stage1_done <= '0';
         elsif rising_edge(clk) then
             where_stage_dout <= fifo_dout;
+            stage1_done <= fifo_empty; -- Sinaliza que não há mais dados entrando neste estágio
         end if;
     end process;
 
@@ -268,9 +273,11 @@ begin
             active      => limit_active,
             din         => where_stage_dout,
             valid_in    => where_valid_and,
+            done_in     => stage1_done,
             dout        => limit_stage_dout,
             valid_out   => limit_valid_out,
-            limit_hit   => limit_hit
+            limit_hit   => limit_hit,
+            done_out    => limit_done_out
         );
 
     -- Fatiamento das colunas saindo do LIMIT para uso do COUNT
@@ -278,8 +285,8 @@ begin
         limit_cols(i) <= limit_stage_dout(((i+1) * DATA_WIDTH) - 1 downto i * DATA_WIDTH);
     end generate;
 
-    -- Fluxo para o COUNT usando saída do LIMIT
-    count_valid_in <= limit_valid_out;
+    -- Fluxo para o COUNT usando saída do LIMIT e bloqueio pelo done token
+    count_valid_in <= '1' when (limit_valid_out = '1' and limit_done_out = '0') else '0';
     count_din <= limit_cols(count_col_idx);
 
     inst_count: count
@@ -295,7 +302,8 @@ begin
         );
 
     -- Configuração e Instância da FIFO de Saída recebendo dados do LIMIT
-    out_fifo_wr_en <= '1' when (limit_valid_out = '1' and load_inst = '0') else '0';
+    -- O sinal limit_done_out garante o bloqueio imediato das escritas se o flush bater nesse estágio
+    out_fifo_wr_en <= '1' when (limit_valid_out = '1' and load_inst = '0' and limit_done_out = '0') else '0';
 
     inst_out_FIFO: FIFO
         Generic map (
@@ -313,6 +321,16 @@ begin
             full  => out_fifo_full,
             empty => out_fifo_empty
         );
+
+    -- Pipeline Stage 3: Atraso final do sinal de Done para alinhamento com a FIFO de saída
+    process(clk, rst)
+    begin
+        if rst = '1' then
+            stage3_done <= '0';
+        elsif rising_edge(clk) then
+            stage3_done <= limit_done_out;
+        end if;
+    end process;
 
     -- Saída do Pipeline (o resultado do Acumulador)
     acc_out <= count_dout;
