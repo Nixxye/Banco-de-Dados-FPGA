@@ -139,7 +139,6 @@ architecture Behavioral of pipeline is
     signal limit_cols       : col_array_t;
 
     signal stage3_done      : STD_LOGIC := '0';
-    signal running_flag     : STD_LOGIC := '0';
 
     -- Sinais para WHERE
     signal where_inst     : matriz_inst_tipo := (others => (others => '0'));
@@ -265,26 +264,15 @@ begin
             rd_en_pipe1 <= '0';
             rd_en_pipe2 <= '0';
             stage1_done <= '0';
-            running_flag <= '0';
         elsif rising_edge(clk) then
-            if load_inst = '1' then
-                running_flag <= '0';
-                stage1_done <= '0';
+            where_stage_dout <= fifo_dout;
+            rd_en_pipe1 <= fifo_rd_en;
+            rd_en_pipe2 <= rd_en_pipe1;
+            
+            if load_inst = '1' or fifo_empty = '1' then
+                stage1_done <= '1';
             else
-                where_stage_dout <= fifo_dout;
-                rd_en_pipe1 <= fifo_rd_en;
-                rd_en_pipe2 <= rd_en_pipe1;
-                
-                if fifo_rd_en = '1' then
-                    running_flag <= '1';
-                end if;
-                
-                -- O stage1_done sinaliza EOF apenas após o pipeline ter começado a rodar e a fila secar
-                if running_flag = '1' and rd_en_pipe2 = '0' then
-                    stage1_done <= '1';
-                else
-                    stage1_done <= '0';
-                end if;
+                stage1_done <= '0';
             end if;
         end if;
     end process;
