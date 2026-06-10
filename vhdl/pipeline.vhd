@@ -33,6 +33,10 @@ entity pipeline is
         -- Acumulador
         acc_out        : out STD_LOGIC_VECTOR (DATA_WIDTH-1 downto 0);
         
+        -- Contadores das FIFOs
+        in_fifo_count  : out integer range 0 to FIFO_DEPTH;
+        out_fifo_count : out integer range 0 to FIFO_DEPTH;
+        
         -- Status do Pipeline
         done           : out STD_LOGIC
     );
@@ -55,7 +59,8 @@ architecture Behavioral of pipeline is
             din      : in  STD_LOGIC_VECTOR ((DATA_WIDTH * NUM_COLS)-1 downto 0);
             dout     : out STD_LOGIC_VECTOR ((DATA_WIDTH * NUM_COLS)-1 downto 0);
             full     : out STD_LOGIC;
-            empty    : out STD_LOGIC
+            empty    : out STD_LOGIC;
+            data_count : out integer range 0 to DEPTH
         );
     end component;
 
@@ -124,6 +129,8 @@ architecture Behavioral of pipeline is
     -- Sinais dos estágios do Pipeline Verdadeiro
     signal where_stage_dout : STD_LOGIC_VECTOR ((DATA_WIDTH * NUM_COLS)-1 downto 0);
     signal stage1_done      : STD_LOGIC := '0';
+    signal rd_en_pipe1      : STD_LOGIC := '0';
+    signal rd_en_pipe2      : STD_LOGIC := '0';
     
     signal limit_stage_dout : STD_LOGIC_VECTOR ((DATA_WIDTH * NUM_COLS)-1 downto 0);
     signal limit_valid_out  : STD_LOGIC;
@@ -209,7 +216,8 @@ begin
             din   => din,
             dout  => fifo_dout,
             full  => fifo_full,
-            empty => fifo_empty
+            empty => fifo_empty,
+            data_count => in_fifo_count
         );
 
     -- Array de colunas da FIFO (fatiamento estático)
@@ -236,10 +244,10 @@ begin
     end generate;
 
     -- Lógica de AND para os filtros WHERE (apenas os ativos)
-    process(where_valid_out, where_active_cnt, fifo_empty)
+    process(where_valid_out, where_active_cnt, rd_en_pipe2)
         variable all_valid : STD_LOGIC;
     begin
-        all_valid := not fifo_empty; -- Só é válido se a FIFO não estiver vazia
+        all_valid := rd_en_pipe2; -- Só é válido se foi oriundo de uma leitura real (valid bit pipeline)
         for i in 0 to NUM_WHERE-1 loop
             if i < where_active_cnt then
                 all_valid := all_valid and where_valid_out(i);
@@ -248,15 +256,21 @@ begin
         where_valid_and <= all_valid;
     end process;
 
-    -- Pipeline Stage 1: Alinha o dado original com a validação do WHERE e rastreia o EOF
+    -- Pipeline Stage 1: Alinha o dado original com a validação do WHERE e rastreia o EOF via read enable pipelining
     process(clk, rst)
     begin
         if rst = '1' then
             where_stage_dout <= (others => '0');
+            rd_en_pipe1 <= '0';
+            rd_en_pipe2 <= '0';
             stage1_done <= '0';
         elsif rising_edge(clk) then
             where_stage_dout <= fifo_dout;
-            stage1_done <= fifo_empty; -- Sinaliza que não há mais dados entrando neste estágio
+            rd_en_pipe1 <= fifo_rd_en;
+            rd_en_pipe2 <= rd_en_pipe1;
+            
+            -- O stage1_done sinaliza EOF quando não houver bit de validade
+            stage1_done <= not rd_en_pipe2; 
         end if;
     end process;
 
@@ -319,7 +333,8 @@ begin
             din   => limit_stage_dout,
             dout  => out_fifo_dout,
             full  => out_fifo_full,
-            empty => out_fifo_empty
+            empty => out_fifo_empty,
+            data_count => out_fifo_count
         );
 
     -- Pipeline Stage 3: Atraso final do sinal de Done para alinhamento com a FIFO de saída
