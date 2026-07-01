@@ -20,6 +20,11 @@ set_module_property REPORT_TO_TALKBACK false
 add_fileset QUARTUS_SYNTH QUARTUS_SYNTH "" ""
 set_fileset_property QUARTUS_SYNTH TOP_LEVEL user_hw
 
+add_fileset_file FIFO.vhd VHDL PATH ../../../../vhdl/FIFO.vhd
+add_fileset_file whereFilter.vhd VHDL PATH ../../../../vhdl/whereFilter.vhd
+add_fileset_file limit.vhd VHDL PATH ../../../../vhdl/limit.vhd
+add_fileset_file count.vhd VHDL PATH ../../../../vhdl/count.vhd
+add_fileset_file pipeline.vhd VHDL PATH ../../../../vhdl/pipeline.vhd
 add_fileset_file user_hw.v VERILOG PATH user_hw.v TOP_LEVEL_FILE
 
 # parameters

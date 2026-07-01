@@ -217,3 +217,15 @@ O modo board-sdcard-raw indica que a fonte final da resposta foi o payload bruto
 ## 7. Conclusão
 
 Nesta entrega parcial, a infraestrutura está funcional em hardware real: interface web, protocolo HTTP, rede na DE2, leitura de tabela em SD real e resposta de consulta no navegador. A integração com user_hw está operacional no barramento, porém ainda em fase de refinamento para garantir saída processada estável sem necessidade de fallback raw. O principal item da próxima fase é concluir a lógica de pipeline no user_hw e retirar os caminhos temporários de fallback/depuração.
+
+## 8. Erros Comuns na Compilação (Quartus)
+
+**Problema 1: Erros do tipo `Can't open DLL "cbx_scfifo.dll"` ou `cbx_lpm_mult.dll`**
+* **Sintoma:** A compilação ("Analysis & Synthesis") falha abruptamente informando que não foi possível carregar bibliotecas DLL internas do Quartus. Muitas vezes é acompanhado de uma notificação silenciosa do *Windows Security* bloqueando processos como `java.exe` ou `ccl_sqlite3_jdbc_jni_bridge.dll`.
+* **Causa:** O Windows Defender ou SmartScreen no Windows 10/11 bloqueia falsos positivos nas bibliotecas de versões legadas do Quartus (ex: 13.0).
+* **Solução:** Adicionar a pasta raiz de instalação do Quartus (ex: `C:\altera`) à "Lista de Exclusões" de pastas no Windows Security (Proteção contra vírus e ameaças -> Gerenciar configurações -> Exclusões). Feche o Quartus e reabra em modo "Executar como Administrador".
+
+**Problema 2: Erro `Node instance "X" instantiates undefined entity "Y"`**
+* **Sintoma:** O Quartus não encontra os módulos VHDL do seu projeto.
+* **Causa:** Arquivos VHDL soltos não foram automaticamente anexados à hierarquia do Qsys/SOPC Builder.
+* **Solução:** Verifique se o arquivo `_hw.tcl` do módulo customizado possui todos os `add_fileset_file` necessários e, após modificar o `.tcl`, reabra o **Qsys** e clique em **Generate** para recriar as dependências antes de compilar no Quartus.

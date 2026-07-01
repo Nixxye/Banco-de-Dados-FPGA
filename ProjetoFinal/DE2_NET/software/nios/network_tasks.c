@@ -29,39 +29,28 @@
 
 #define HW_REG_CONTROL_OFFSET 0
 #define HW_REG_DATA_IN_OFFSET 4
-#define HW_REG_STATUS_OFFSET 8
-#define HW_REG_DATA_OUT_OFFSET 12
+#define HW_REG_INSTRUCTION_OFFSET 8
+#define HW_REG_STATUS_OFFSET 12
+#define HW_REG_DATA_OUT_OFFSET 16
+#define HW_REG_ACCUMULATOR_OFFSET 20
 
-#define HW_CONTROL_WRITE_STROBE 0x01
-#define HW_CONTROL_INPUT_EOF 0x02
-#define HW_CONTROL_CLEAR 0x04
+#define HW_CONTROL_DIN_VALID 0x01
+#define HW_CONTROL_LOAD_INST 0x02
+#define HW_CONTROL_RD_OUT_FIFO 0x04
+#define HW_CONTROL_RST 0x08
 
-#define HW_STATUS_INPUT_FULL 0x01
-#define HW_STATUS_OUTPUT_VALID 0x02
-#define HW_STATUS_BUSY 0x04
-#define HW_STATUS_DONE 0x08
+#define HW_STATUS_OUT_FIFO_FULL 0x01
+#define HW_STATUS_OUT_FIFO_EMPTY 0x02
+#define HW_STATUS_DONE 0x04
+#define HW_STATUS_IN_FIFO_EMPTY 0x08
+#define HW_STATUS_IN_FIFO_FULL 0x10
 
 #define QUERY_CAPTURE_BUFFER_SIZE \
     (QUERY_MAX_ROWS * TABLE_MAX_COLUMNS * TABLE_CELL_SIZE)
 
 #define QUERY_SELECT_MAX_LEN QUERY_SQL_MAX_LEN
 #define QUERY_WHERE_MAX_LEN QUERY_SQL_MAX_LEN
-#define QUERY_DESCRIPTOR_BUFFER_SIZE 1024
-#define HW_STALL_MAX_CYCLES 1000000
-#define HW_USE_QUERY_DESCRIPTOR 0
 
-#define QUERY_META_MAGIC 0x31595251UL
-
-#define QUERY_TLV_TABLE_NAME 1UL
-#define QUERY_TLV_RAW_SQL 2UL
-#define QUERY_TLV_SELECT_LIST 3UL
-#define QUERY_TLV_WHERE_CLAUSE 4UL
-#define QUERY_TLV_LIMIT 5UL
-#define QUERY_TLV_SOURCE_COLUMNS 6UL
-#define QUERY_TLV_SOURCE_COLUMN_COUNT 7UL
-#define QUERY_TLV_SOURCE_ROW_COUNT 8UL
-#define QUERY_TLV_SOURCE_ROW_WIDTH 9UL
-#define QUERY_TLV_SOURCE_CELL_SIZE 10UL
 
 #define MIN_ALT_U32(a, b) ((a) < (b) ? (a) : (b))
 
@@ -101,10 +90,10 @@ static QueryRequest pending_request;
 
 static char rx_request_buffer[QUERY_REQUEST_BUFFER_SIZE];
 static unsigned char captured_output_buffer[QUERY_CAPTURE_BUFFER_SIZE];
-static unsigned char query_descriptor_buffer[QUERY_DESCRIPTOR_BUFFER_SIZE];
 static char http_response_body[MAX_RESPONSE_BODY_SIZE];
 
 static int load_table_schema(FILE *table_file, TableSchema *schema);
+static void hw_send_instruction(alt_u32 instruction);
 
 static alt_u32 read_le32(const unsigned char *raw)
 {
@@ -316,141 +305,78 @@ static void extract_sql_fragments(const char *sql, QueryRequest *request)
     }
 }
 
-static void write_le32_bytes(unsigned char *dst, alt_u32 value)
+static int find_column_index(const TableSchema *schema, const char *col_name)
 {
-    dst[0] = (unsigned char)(value & 0xFF);
-    dst[1] = (unsigned char)((value >> 8) & 0xFF);
-    dst[2] = (unsigned char)((value >> 16) & 0xFF);
-    dst[3] = (unsigned char)((value >> 24) & 0xFF);
-}
-
-static int descriptor_append_tlv(unsigned char *dst,
-                                 int dst_size,
-                                 int *offset,
-                                 alt_u32 type,
-                                 const unsigned char *value,
-                                 int value_len)
-{
-    int padded_len = (value_len + 3) & ~3;
-
-    if ((*offset + 8 + padded_len) > dst_size)
-    {
-        return 0;
-    }
-
-    write_le32_bytes(dst + *offset, type);
-    write_le32_bytes(dst + *offset + 4, (alt_u32)value_len);
-    *offset += 8;
-
-    if (value_len > 0)
-    {
-        memcpy(dst + *offset, value, value_len);
-    }
-    if (padded_len > value_len)
-    {
-        memset(dst + *offset + value_len, 0, padded_len - value_len);
-    }
-
-    *offset += padded_len;
-    return 1;
-}
-
-static int descriptor_append_text(unsigned char *dst,
-                                  int dst_size,
-                                  int *offset,
-                                  alt_u32 type,
-                                  const char *value)
-{
-    return descriptor_append_tlv(dst,
-                                 dst_size,
-                                 offset,
-                                 type,
-                                 (const unsigned char *)value,
-                                 (int)strlen(value));
-}
-
-static int descriptor_append_u32(unsigned char *dst,
-                                 int dst_size,
-                                 int *offset,
-                                 alt_u32 type,
-                                 alt_u32 value)
-{
-    unsigned char raw[4];
-
-    write_le32_bytes(raw, value);
-    return descriptor_append_tlv(dst, dst_size, offset, type, raw, sizeof(raw));
-}
-
-static int build_source_columns_csv(const TableSchema *schema, char *dst, int dst_size)
-{
-    int offset = 0;
-    alt_u32 index;
-
-    if (dst_size <= 0)
-    {
-        return 0;
-    }
-
-    dst[0] = '\0';
-    for (index = 0; index < schema->column_count; index++)
-    {
-        int written = snprintf(dst + offset,
-                               dst_size - offset,
-                               "%s%s",
-                               (index == 0) ? "" : ",",
-                               schema->columns[index]);
-
-        if (written < 0 || written >= (dst_size - offset))
-        {
-            return 0;
+    alt_u32 i;
+    for (i = 0; i < schema->column_count; i++) {
+        if (ascii_strncasecmp_local(schema->columns[i], col_name, strlen(col_name)) == 0 && strlen(schema->columns[i]) == strlen(col_name)) {
+            return (int)i;
         }
-
-        offset += written;
     }
-
-    return 1;
+    return -1;
 }
 
-static int build_query_descriptor(const QueryRequest *request,
-                                  const TableSchema *schema,
-                                  unsigned char *buffer,
-                                  int buffer_size,
-                                  alt_u32 *descriptor_size)
+static void compile_and_send_instructions(const QueryRequest *request, const TableSchema *schema)
 {
-    char columns_csv[(TABLE_MAX_COLUMNS * (TABLE_CELL_SIZE + 1)) + 1];
-    int offset = 8;
+    alt_u32 inst;
+    
+    inst = (2UL << 28) | (request->limit & 0xFF);
+    hw_send_instruction(inst);
 
-    if (buffer_size < 8)
-    {
-        return 0;
+    if (request->where_clause[0] != '\0') {
+        char col_name[64] = {0};
+        char op_str[4] = {0};
+        int val = 0;
+        char *ptr = (char*)request->where_clause;
+        
+        while (*ptr == ' ') ptr++;
+        
+        int i = 0;
+        while (*ptr != ' ' && *ptr != '=' && *ptr != '<' && *ptr != '>' && *ptr != '!' && *ptr != '\0' && i < 63) {
+            col_name[i++] = *ptr++;
+        }
+        col_name[i] = '\0';
+        
+        while (*ptr == ' ') ptr++;
+        
+        i = 0;
+        while ((*ptr == '=' || *ptr == '<' || *ptr == '>' || *ptr == '!') && i < 3) {
+            op_str[i++] = *ptr++;
+        }
+        op_str[i] = '\0';
+        
+        while (*ptr == ' ') ptr++;
+        
+        val = atoi(ptr);
+        
+        int col_idx = find_column_index(schema, col_name);
+        if (col_idx >= 0) {
+            int op_code = 0;
+            if (strcmp(op_str, "=") == 0 || strcmp(op_str, "==") == 0) op_code = 0;
+            else if (strcmp(op_str, "!=") == 0) op_code = 1;
+            else if (strcmp(op_str, "<") == 0) op_code = 2;
+            else if (strcmp(op_str, "<=") == 0) op_code = 3;
+            else if (strcmp(op_str, ">") == 0) op_code = 4;
+            else if (strcmp(op_str, ">=") == 0) op_code = 5;
+            
+            inst = (1UL << 28) | ((col_idx & 0x3F) << 11) | ((val & 0xFF) << 3) | (op_code & 0x7);
+            hw_send_instruction(inst);
+        }
     }
-
-    if (!build_source_columns_csv(schema, columns_csv, sizeof(columns_csv)))
-    {
-        return 0;
+    
+    if (ascii_strncasecmp_local(request->select_list, "COUNT(", 6) == 0) {
+        char col_name[64] = {0};
+        char *ptr = (char*)request->select_list + 6;
+        int i = 0;
+        while (*ptr != ')' && *ptr != '\0' && i < 63) {
+            col_name[i++] = *ptr++;
+        }
+        col_name[i] = '\0';
+        int col_idx = find_column_index(schema, col_name);
+        if (col_idx < 0) col_idx = 0;
+        inst = (3UL << 28) | (col_idx & 0x3F);
+        hw_send_instruction(inst);
     }
-
-    memset(buffer, 0, buffer_size);
-    write_le32_bytes(buffer, QUERY_META_MAGIC);
-    write_le32_bytes(buffer + 4, 0);
-
-    if (!descriptor_append_text(buffer, buffer_size, &offset, QUERY_TLV_TABLE_NAME, request->table) ||
-        !descriptor_append_text(buffer, buffer_size, &offset, QUERY_TLV_RAW_SQL, request->sql) ||
-        !descriptor_append_text(buffer, buffer_size, &offset, QUERY_TLV_SELECT_LIST, request->select_list) ||
-        !descriptor_append_text(buffer, buffer_size, &offset, QUERY_TLV_WHERE_CLAUSE, request->where_clause) ||
-        !descriptor_append_u32(buffer, buffer_size, &offset, QUERY_TLV_LIMIT, request->limit) ||
-        !descriptor_append_text(buffer, buffer_size, &offset, QUERY_TLV_SOURCE_COLUMNS, columns_csv) ||
-        !descriptor_append_u32(buffer, buffer_size, &offset, QUERY_TLV_SOURCE_COLUMN_COUNT, schema->column_count) ||
-        !descriptor_append_u32(buffer, buffer_size, &offset, QUERY_TLV_SOURCE_ROW_COUNT, schema->row_count) ||
-        !descriptor_append_u32(buffer, buffer_size, &offset, QUERY_TLV_SOURCE_ROW_WIDTH, schema->row_width) ||
-        !descriptor_append_u32(buffer, buffer_size, &offset, QUERY_TLV_SOURCE_CELL_SIZE, TABLE_CELL_SIZE))
-    {
-        return 0;
-    }
-
-    write_le32_bytes(buffer + 4, (alt_u32)offset);
-    *descriptor_size = (alt_u32)offset;
-    return 1;
 }
 
 static int extract_line_value(const char *body,
@@ -685,18 +611,19 @@ static alt_u32 hw_read_status(void)
 
 static void hw_clear(void)
 {
-    IOWR_32DIRECT(USER_HW_0_BASE, HW_REG_CONTROL_OFFSET, HW_CONTROL_CLEAR);
+    IOWR_32DIRECT(USER_HW_0_BASE, HW_REG_CONTROL_OFFSET, HW_CONTROL_RST);
 }
 
 static void hw_write_word(alt_u32 word)
 {
     IOWR_32DIRECT(USER_HW_0_BASE, HW_REG_DATA_IN_OFFSET, word);
-    IOWR_32DIRECT(USER_HW_0_BASE, HW_REG_CONTROL_OFFSET, HW_CONTROL_WRITE_STROBE);
+    IOWR_32DIRECT(USER_HW_0_BASE, HW_REG_CONTROL_OFFSET, HW_CONTROL_DIN_VALID);
 }
 
-static void hw_signal_eof(void)
+static void hw_send_instruction(alt_u32 instruction)
 {
-    IOWR_32DIRECT(USER_HW_0_BASE, HW_REG_CONTROL_OFFSET, HW_CONTROL_INPUT_EOF);
+    IOWR_32DIRECT(USER_HW_0_BASE, HW_REG_INSTRUCTION_OFFSET, instruction);
+    IOWR_32DIRECT(USER_HW_0_BASE, HW_REG_CONTROL_OFFSET, HW_CONTROL_LOAD_INST);
 }
 
 static void close_client_socket(void)
@@ -714,9 +641,11 @@ static int drain_output_words(unsigned char *capture_buffer,
 {
     alt_u32 status = hw_read_status();
 
-    while ((status & HW_STATUS_OUTPUT_VALID) != 0)
+    while ((status & HW_STATUS_OUT_FIFO_EMPTY) == 0)
     {
         alt_u32 word = IORD_32DIRECT(USER_HW_0_BASE, HW_REG_DATA_OUT_OFFSET);
+        
+        IOWR_32DIRECT(USER_HW_0_BASE, HW_REG_CONTROL_OFFSET, HW_CONTROL_RD_OUT_FIFO);
 
         if (*captured_size < capture_limit_bytes)
         {
@@ -727,37 +656,6 @@ static int drain_output_words(unsigned char *capture_buffer,
         status = hw_read_status();
     }
 
-    return 1;
-}
-
-/*
- * Verifica se o user_hw implementa o protocolo FIFO/descriptor esperado.
- * Retorna 1 quando compativel, 0 quando aparenta protocolo legado.
- */
-static int probe_user_hw_protocol(void)
-{
-    alt_u32 status;
-    alt_u32 echoed;
-
-    hw_clear();
-
-    /* Envia uma palavra de teste como payload (nao magic/descriptor). */
-    hw_write_word(0xA55A1234u);
-    status = hw_read_status();
-
-    /*
-     * No protocolo FIFO atual, apos um push deve haver dado valido
-     * (bit 1) e contador interno em [15:8] > 0.
-     */
-    if (((status & HW_STATUS_OUTPUT_VALID) == 0) || (((status >> 8) & 0xFFu) == 0))
-    {
-        return 0;
-    }
-
-    echoed = IORD_32DIRECT(USER_HW_0_BASE, HW_REG_DATA_OUT_OFFSET);
-    (void)echoed;
-
-    hw_clear();
     return 1;
 }
 
@@ -810,7 +708,7 @@ static int buffer_has_visible_data(const unsigned char *data, int byte_count)
 
 static int feed_source_to_hardware(StreamSource *source,
                                    alt_u32 total_bytes,
-                                   int signal_eof_at_end,
+                                   int wait_for_done,
                                    int capture_limit_bytes,
                                    unsigned char *capture_buffer,
                                    int *captured_size)
@@ -823,7 +721,7 @@ static int feed_source_to_hardware(StreamSource *source,
     {
         alt_u32 status = hw_read_status();
 
-        if ((status & HW_STATUS_INPUT_FULL) != 0)
+        if ((status & HW_STATUS_IN_FIFO_FULL) != 0)
         {
             if (!drain_output_words(capture_buffer, capture_limit_bytes, captured_size))
             {
@@ -853,12 +751,10 @@ static int feed_source_to_hardware(StreamSource *source,
         }
     }
 
-    if (!signal_eof_at_end)
+    if (!wait_for_done)
     {
         return 1;
     }
-
-    hw_signal_eof();
 
     for (stall_guard = 0; stall_guard < HW_STALL_MAX_CYCLES; stall_guard++)
     {
@@ -870,7 +766,8 @@ static int feed_source_to_hardware(StreamSource *source,
         }
 
         status = hw_read_status();
-        if (((status & HW_STATUS_OUTPUT_VALID) == 0) && ((status & HW_STATUS_DONE) != 0))
+        
+        if (((status & HW_STATUS_OUT_FIFO_EMPTY) != 0) && ((status & HW_STATUS_DONE) != 0))
         {
             return 1;
         }
@@ -1036,18 +933,15 @@ static void process_request(void)
 {
     TableSchema schema;
     StreamSource source;
-    StreamSource descriptor_source;
     const unsigned char *result_rows = captured_output_buffer;
     int result_size = 0;
     alt_u32 total_bytes = 0;
-    alt_u32 descriptor_bytes = 0;
     int capture_limit_bytes = 0;
     int captured_size = 0;
     const char *mode = "board-sdcard";
 
     memset(&schema, 0, sizeof(schema));
     memset(&source, 0, sizeof(source));
-    memset(&descriptor_source, 0, sizeof(descriptor_source));
     memset(captured_output_buffer, 0, sizeof(captured_output_buffer));
 
     if (USER_HW_0_BASE == 0)
@@ -1089,29 +983,9 @@ static void process_request(void)
         capture_limit_bytes = sizeof(captured_output_buffer);
     }
 
-    if (!build_query_descriptor(&pending_request,
-                                &schema,
-                                query_descriptor_buffer,
-                                sizeof(query_descriptor_buffer),
-                                &descriptor_bytes))
-    {
-        send_error_response(current_client_socket,
-                            500,
-                            "Internal Server Error",
-                            "Falha ao montar o descritor da consulta para o hardware.");
-        return;
-    }
-
-    descriptor_source.memory = query_descriptor_buffer;
-    descriptor_source.memory_size = descriptor_bytes;
-    descriptor_source.memory_offset = 0;
-
     hw_clear();
-
-    if (!probe_user_hw_protocol())
-    {
-        printf("Aviso: sonda de protocolo user_hw inconclusiva; seguindo com processamento.\n");
-    }
+    
+    compile_and_send_instructions(&pending_request, &schema);
 
     printf("HW feed: rows=%lu row_width=%lu total_bytes=%lu limit=%lu\n",
            (unsigned long)schema.row_count,
@@ -1123,34 +997,6 @@ static void process_request(void)
     {
         int preview_bytes = (schema.row_width < 32) ? (int)schema.row_width : 32;
         debug_dump_bytes("SRC row0:", source.memory, preview_bytes);
-    }
-
-    if (HW_USE_QUERY_DESCRIPTOR)
-    {
-        int descriptor_status = feed_source_to_hardware(&descriptor_source,
-                                                        descriptor_bytes,
-                                                        total_bytes == 0,
-                                                        0,
-                                                        captured_output_buffer,
-                                                        &captured_size);
-
-        if (descriptor_status < 0)
-        {
-            send_error_response(current_client_socket,
-                                500,
-                                "Internal Server Error",
-                                "Descritor da consulta truncado antes do envio completo ao hardware.");
-            return;
-        }
-
-        if (descriptor_status == 0)
-        {
-            send_error_response(current_client_socket,
-                                504,
-                                "Gateway Timeout",
-                                "Timeout aguardando o hardware consumir ou devolver o descritor da consulta.");
-            return;
-        }
     }
 
     if (total_bytes > 0)
