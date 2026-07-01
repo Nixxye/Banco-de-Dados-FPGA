@@ -1,0 +1,50 @@
+[*]
+[*] GTKWave Analyzer
+[*]
+[timestart] 0
+[size] 1400 800
+[treeopen] tb_pipeline.
+[treeopen] tb_pipeline.uut.
+@200
+-SYSTEM
+@28
+tb_pipeline.clk
+tb_pipeline.rst
+tb_pipeline.done
+@200
+-INSTRUCTION FETCHER
+@28
+tb_pipeline.load_inst
+@22
+tb_pipeline.instruction[31:0]
+@200
+-INPUT FIFO
+@28
+tb_pipeline.din_valid
+tb_pipeline.empty
+tb_pipeline.full
+@22
+tb_pipeline.din[31:0]
+@200
+-WHERE FILTER
+@28
+tb_pipeline.uut.where_valid_and
+@200
+-LIMIT FILTER
+@28
+tb_pipeline.uut.limit_active
+tb_pipeline.uut.limit_dout
+@200
+-COUNT ACCUMULATOR
+@28
+tb_pipeline.uut.count_active
+@22
+tb_pipeline.acc_out[7:0]
+@200
+-OUTPUT FIFO
+@28
+tb_pipeline.rd_out_fifo
+tb_pipeline.out_fifo_empty
+tb_pipeline.out_fifo_full
+@22
+tb_pipeline.out_fifo_dout[31:0]
