@@ -1,0 +1,30 @@
+# ModelSim / GHDL
+*.o
+*.cf
+*.vcd
+*.wlf
+*.exe
+work/
+modelsim.ini
+
+# Quartus
+db/
+incremental_db/
+output_files/
+simulation/
+greybox_tmp/
+*.qws
+*.rpt
+*.smsg
+*.summary
+*.pin
+*.done
+*.qdf
+*.jdi
+
+# Nios II Software
+*.obj
+*.d
+*.elf
+*.srec
+*.map

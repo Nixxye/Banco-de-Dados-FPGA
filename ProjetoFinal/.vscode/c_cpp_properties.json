@@ -1,0 +1,50 @@
+{
+  "version": 4,
+  "configurations": [
+    {
+      "name": "Nios II DE2",
+      "compilerPath": "C:/altera/13.0sp1/nios2eds/bin/gnu/H-i686-mingw32/bin/nios2-elf-gcc.exe",
+      "intelliSenseMode": "windows-gcc-x86",
+      "cStandard": "c99",
+      "cppStandard": "c++98",
+      "defines": [
+        "SYSTEM_BUS_WIDTH=32",
+        "__hal__",
+        "ALT_NO_INSTRUCTION_EMULATION",
+        "ALT_INICHE",
+        "__ucosii__"
+      ],
+      "includePath": [
+        "${workspaceFolder}/DE2_NET/software/nios",
+        "${workspaceFolder}/DE2_NET/software/nios_bsp/iniche/inc",
+        "${workspaceFolder}/DE2_NET/software/nios_bsp/iniche/src/h",
+        "${workspaceFolder}/DE2_NET/software/nios_bsp/iniche/src/h/nios2",
+        "${workspaceFolder}/DE2_NET/software/nios_bsp/iniche/src/nios2",
+        "${workspaceFolder}/DE2_NET/software/nios_bsp/UCOSII/inc",
+        "${workspaceFolder}/DE2_NET/software/nios_bsp/HAL/inc",
+        "${workspaceFolder}/DE2_NET/software/nios_bsp/drivers/inc",
+        "${workspaceFolder}/DE2_NET/software/nios_bsp",
+        "C:/altera/13.0sp1/nios2eds/bin/gnu/H-i686-mingw32/lib/gcc/nios2-elf/4.1.2/include",
+        "C:/altera/13.0sp1/nios2eds/bin/gnu/H-i686-mingw32/lib/gcc/nios2-elf/4.1.2/include-fixed",
+        "C:/altera/13.0sp1/nios2eds/bin/gnu/H-i686-mingw32/nios2-elf/include"
+      ],
+      "browse": {
+        "limitSymbolsToIncludedHeaders": true,
+        "path": [
+          "${workspaceFolder}/DE2_NET/software/nios",
+          "${workspaceFolder}/DE2_NET/software/nios_bsp/iniche/inc",
+          "${workspaceFolder}/DE2_NET/software/nios_bsp/iniche/src/h",
+          "${workspaceFolder}/DE2_NET/software/nios_bsp/iniche/src/h/nios2",
+          "${workspaceFolder}/DE2_NET/software/nios_bsp/iniche/src/nios2",
+          "${workspaceFolder}/DE2_NET/software/nios_bsp/UCOSII/inc",
+          "${workspaceFolder}/DE2_NET/software/nios_bsp/HAL/inc",
+          "${workspaceFolder}/DE2_NET/software/nios_bsp/drivers/inc",
+          "${workspaceFolder}/DE2_NET/software/nios_bsp",
+          "C:/altera/13.0sp1/nios2eds/bin/gnu/H-i686-mingw32/lib/gcc/nios2-elf/4.1.2/include",
+          "C:/altera/13.0sp1/nios2eds/bin/gnu/H-i686-mingw32/lib/gcc/nios2-elf/4.1.2/include-fixed",
+          "C:/altera/13.0sp1/nios2eds/bin/gnu/H-i686-mingw32/nios2-elf/include"
+        ]
+      }
+    }
+  ]
+}
