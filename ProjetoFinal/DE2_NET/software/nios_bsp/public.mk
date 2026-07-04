@@ -87,11 +87,11 @@ ACDS_VERSION := 13.0sp1
 
 # Quartus Generated JDI File. Required for resolving node instance ID's with 
 # design component names. 
-JDI_FILE := C:/ProjetoFinal/DE2_NET/DE2_NET.jdi
+JDI_FILE := $(ABS_BSP_ROOT_DIR)/../../DE2_NET.jdi
 
 # Qsys--generated SOPCINFO file. Required for resolving node instance ID's with 
 # design component names. 
-SOPCINFO_FILE := C:/ProjetoFinal/DE2_NET/system_0.sopcinfo
+SOPCINFO_FILE := $(ABS_BSP_ROOT_DIR)/../../system_0.sopcinfo
 
 # Big-Endian operation. 
 # setting BIG_ENDIAN is false
@@ -156,9 +156,9 @@ SOPC_SYSID_FLAG += --sidp=0x1a820e0
 ELF_PATCH_FLAG  += --sidp 0x1a820e0
 
 # The SOPC Timestamp 
-# setting SOPC_TIMESTAMP is 1779900061
-SOPC_SYSID_FLAG += --timestamp=1779900061
-ELF_PATCH_FLAG  += --timestamp 1779900061
+# setting SOPC_TIMESTAMP is 1783190714
+SOPC_SYSID_FLAG += --timestamp=1783190714
+ELF_PATCH_FLAG  += --timestamp 1783190714
 
 # Enable JTAG UART driver to recover when host is inactive causing buffer to 
 # full without returning error. Printf will not fail with this recovery. none 

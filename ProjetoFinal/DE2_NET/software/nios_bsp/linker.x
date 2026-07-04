@@ -2,9 +2,9 @@
  * linker.x - Linker script
  *
  * Machine generated for CPU 'cpu_0' in SOPC Builder design 'system_0'
- * SOPC Builder design path: C:/ProjetoFinal/DE2_NET/system_0.sopcinfo
+ * SOPC Builder design path: ../../system_0.sopcinfo
  *
- * Generated: Fri Jun 12 12:48:57 BRT 2026
+ * Generated: Fri Jul 03 16:06:35 BRT 2026
  */
 
 /*

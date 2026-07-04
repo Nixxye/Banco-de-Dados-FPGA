@@ -2,9 +2,9 @@
  * system.h - SOPC Builder system and BSP software package information
  *
  * Machine generated for CPU 'cpu_0' in SOPC Builder design 'system_0'
- * SOPC Builder design path: C:/ProjetoFinal/DE2_NET/system_0.sopcinfo
+ * SOPC Builder design path: ../../system_0.sopcinfo
  *
- * Generated: Fri Jun 12 12:48:57 BRT 2026
+ * Generated: Sat Jul 04 15:48:15 BRT 2026
  */
 
 /*
@@ -605,7 +605,7 @@
 #define SYSID_QSYS_0_IRQ_INTERRUPT_CONTROLLER_ID -1
 #define SYSID_QSYS_0_NAME "/dev/sysid_qsys_0"
 #define SYSID_QSYS_0_SPAN 8
-#define SYSID_QSYS_0_TIMESTAMP 1779900061
+#define SYSID_QSYS_0_TIMESTAMP 1783190714
 #define SYSID_QSYS_0_TYPE "altera_avalon_sysid_qsys"
 
 

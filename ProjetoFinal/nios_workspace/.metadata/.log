@@ -1,0 +1,304 @@
+!SESSION 2026-07-03 16:00:23.162 -----------------------------------------------
+eclipse.buildId=M20120208-0800
+java.version=1.6.0_23
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=win32, ARCH=x86, WS=win32, NL=pt_BR
+Framework arguments:  -product org.eclipse.epp.package.cpp.product -perspective com.altera.sbtgui.ui.cPerspective
+Command-line arguments:  -os win32 -ws win32 -arch x86 -product org.eclipse.epp.package.cpp.product -perspective com.altera.sbtgui.ui.cPerspective
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-07-03 16:03:26.410
+!MESSAGE Indexed 'nios_bsp' (231 sources, 135 headers) in 1,38 sec: 8.549 declarations; 43.107 references; 170 unresolved inclusions; 8 syntax errors; 488 unresolved names (0,94%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-07-03 16:04:43.338
+!MESSAGE Indexed 'nios' (5 sources, 76 headers) in 0,33 sec: 3.704 declarations; 5.021 references; 17 unresolved inclusions; 2 syntax errors; 262 unresolved names (2,92%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-07-03 16:04:44.564
+!MESSAGE Indexed 'nios_bsp' (231 sources, 203 headers) in 1,22 sec: 11.908 declarations; 46.549 references; 0 unresolved inclusions; 3 syntax errors; 171 unresolved names (0,29%)
+
+!ENTRY com.altera.sbtgui.core 4 0 2026-07-03 16:05:02.730
+!MESSAGE Error executing 'nios2-bsp-generate-files --bsp-dir . --settings settings.bsp', unexpected return code 1.
+
+Error message:
+
+SEVERE: File not found: C:\ProjetoFinal\DE2_NET\system_0.sopcinfo
+SEVERE: File not found: C:\ProjetoFinal\DE2_NET\system_0.sopcinfo
+SEVERE: nios2-bsp-generate-files failed.
+
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-03 16:16:20.792
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --sidp=0x1a820e0 --id=0x0 --timestamp=1782935809]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-03 16:16:23.287
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --sidp=0x1a820e0 --id=0x0 --timestamp=1782935809 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+!SESSION 2026-07-03 16:51:43.111 -----------------------------------------------
+eclipse.buildId=M20120208-0800
+java.version=1.6.0_23
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=win32, ARCH=x86, WS=win32, NL=pt_BR
+Framework arguments:  -product org.eclipse.epp.package.cpp.product -perspective com.altera.sbtgui.ui.cPerspective
+Command-line arguments:  -os win32 -ws win32 -arch x86 -product org.eclipse.epp.package.cpp.product -perspective com.altera.sbtgui.ui.cPerspective
+
+!ENTRY com.altera.sbtgui.launch 4 0 2026-07-03 16:53:55.579
+!MESSAGE Unable to validate connection settings.
+!STACK 0
+java.lang.Exception: Connected system ID hash not found on target at expected base address.
+	at com.altera.embeddedsw.flash.model.internal.SystemConsoleConnectionModel.assertTrue(SystemConsoleConnectionModel.java:645)
+	at com.altera.embeddedsw.flash.model.internal.SystemConsoleConnectionModel.validateSystemId(SystemConsoleConnectionModel.java:589)
+	at com.altera.embeddedsw.flash.model.internal.SystemConsoleConnectionModel.validateConnectionSettings(SystemConsoleConnectionModel.java:511)
+	at com.altera.sbtgui.launch.hardware.AbstractNios2CLaunchDelegate.launch(AbstractNios2CLaunchDelegate.java:115)
+	at com.altera.sbtgui.launch.hardware.Nios2HardwareLaunchDelegate.launch(Nios2HardwareLaunchDelegate.java:98)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:854)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:703)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin.buildAndLaunch(DebugUIPlugin.java:937)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin$8.run(DebugUIPlugin.java:1141)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:54)
+
+!ENTRY com.altera.sbtgui.launch 4 0 2026-07-03 16:53:55.583
+!MESSAGE Unable to validate connection settings.
+!STACK 0
+java.lang.Exception: Connected system ID hash not found on target at expected base address.
+	at com.altera.embeddedsw.flash.model.internal.SystemConsoleConnectionModel.assertTrue(SystemConsoleConnectionModel.java:645)
+	at com.altera.embeddedsw.flash.model.internal.SystemConsoleConnectionModel.validateSystemId(SystemConsoleConnectionModel.java:589)
+	at com.altera.embeddedsw.flash.model.internal.SystemConsoleConnectionModel.validateConnectionSettings(SystemConsoleConnectionModel.java:511)
+	at com.altera.sbtgui.launch.hardware.AbstractNios2CLaunchDelegate.launch(AbstractNios2CLaunchDelegate.java:115)
+	at com.altera.sbtgui.launch.hardware.Nios2HardwareLaunchDelegate.launch(Nios2HardwareLaunchDelegate.java:98)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:854)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:703)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin.buildAndLaunch(DebugUIPlugin.java:937)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin$8.run(DebugUIPlugin.java:1141)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:54)
+!SESSION 2026-07-03 17:12:47.215 -----------------------------------------------
+eclipse.buildId=M20120208-0800
+java.version=1.6.0_23
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=win32, ARCH=x86, WS=win32, NL=pt_BR
+Framework arguments:  -product org.eclipse.epp.package.cpp.product -perspective com.altera.sbtgui.ui.cPerspective
+Command-line arguments:  -os win32 -ws win32 -arch x86 -product org.eclipse.epp.package.cpp.product -perspective com.altera.sbtgui.ui.cPerspective
+
+!ENTRY com.altera.sbtgui.launch 4 0 2026-07-03 17:16:37.626
+!MESSAGE Unable to validate connection settings.
+!STACK 0
+java.lang.Exception: Connected system ID hash not found on target at expected base address.
+	at com.altera.embeddedsw.flash.model.internal.SystemConsoleConnectionModel.assertTrue(SystemConsoleConnectionModel.java:645)
+	at com.altera.embeddedsw.flash.model.internal.SystemConsoleConnectionModel.validateSystemId(SystemConsoleConnectionModel.java:589)
+	at com.altera.embeddedsw.flash.model.internal.SystemConsoleConnectionModel.validateConnectionSettings(SystemConsoleConnectionModel.java:511)
+	at com.altera.sbtgui.launch.hardware.AbstractNios2CLaunchDelegate.launch(AbstractNios2CLaunchDelegate.java:115)
+	at com.altera.sbtgui.launch.hardware.Nios2HardwareLaunchDelegate.launch(Nios2HardwareLaunchDelegate.java:98)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:854)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:703)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin.buildAndLaunch(DebugUIPlugin.java:937)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin$8.run(DebugUIPlugin.java:1141)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:54)
+
+!ENTRY com.altera.sbtgui.launch 4 0 2026-07-03 17:16:37.630
+!MESSAGE Unable to validate connection settings.
+!STACK 0
+java.lang.Exception: Connected system ID hash not found on target at expected base address.
+	at com.altera.embeddedsw.flash.model.internal.SystemConsoleConnectionModel.assertTrue(SystemConsoleConnectionModel.java:645)
+	at com.altera.embeddedsw.flash.model.internal.SystemConsoleConnectionModel.validateSystemId(SystemConsoleConnectionModel.java:589)
+	at com.altera.embeddedsw.flash.model.internal.SystemConsoleConnectionModel.validateConnectionSettings(SystemConsoleConnectionModel.java:511)
+	at com.altera.sbtgui.launch.hardware.AbstractNios2CLaunchDelegate.launch(AbstractNios2CLaunchDelegate.java:115)
+	at com.altera.sbtgui.launch.hardware.Nios2HardwareLaunchDelegate.launch(Nios2HardwareLaunchDelegate.java:98)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:854)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:703)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin.buildAndLaunch(DebugUIPlugin.java:937)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin$8.run(DebugUIPlugin.java:1141)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:54)
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-03 17:19:15.468
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-03 17:19:17.266
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+!SESSION 2026-07-03 17:27:21.689 -----------------------------------------------
+eclipse.buildId=M20120208-0800
+java.version=1.6.0_23
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=win32, ARCH=x86, WS=win32, NL=pt_BR
+Framework arguments:  -product org.eclipse.epp.package.cpp.product -perspective com.altera.sbtgui.ui.cPerspective
+Command-line arguments:  -os win32 -ws win32 -arch x86 -product org.eclipse.epp.package.cpp.product -perspective com.altera.sbtgui.ui.cPerspective
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-03 17:28:43.767
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-03 17:28:45.551
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-03 17:48:30.347
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-03 17:48:32.132
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-03 17:54:51.186
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-03 17:54:52.980
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+!SESSION 2026-07-04 11:08:12.368 -----------------------------------------------
+eclipse.buildId=M20120208-0800
+java.version=1.6.0_23
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=win32, ARCH=x86, WS=win32, NL=pt_BR
+Framework arguments:  -product org.eclipse.epp.package.cpp.product -perspective com.altera.sbtgui.ui.cPerspective
+Command-line arguments:  -os win32 -ws win32 -arch x86 -product org.eclipse.epp.package.cpp.product -perspective com.altera.sbtgui.ui.cPerspective
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 11:11:33.094
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 11:11:35.193
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 11:25:05.307
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 11:25:07.467
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 11:37:30.106
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 11:37:32.150
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 11:45:55.948
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 11:45:58.113
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 11:53:02.522
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 11:53:04.653
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 12:38:45.539
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 12:38:47.685
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 12:47:18.850
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 12:47:20.989
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 13:40:36.139
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 13:40:38.226
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 13:52:48.068
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 13:52:50.213
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 14:33:36.262
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 14:33:38.313
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 15:07:31.221
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 15:07:33.384
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 15:25:10.245
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 15:25:12.276
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 15:39:24.802
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 15:39:26.966
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 15:47:44.146
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 15:47:45.947
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 15:49:35.020
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 15:49:36.819
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 15:56:18.499
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 4 0 2026-07-04 15:56:20.641
+!MESSAGE Failed Executing: [nios2-download, '--cable=USB-Blaster on localhost [USB-0]', --device=1, --instance=0, --stop, --accept-bad-sysid, --sidp=0x1a820e0] return code: 2, no processors found
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 15:56:21.080
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 4 0 2026-07-04 15:56:23.457
+!MESSAGE Failed Executing: [nios2-download, '--cable=USB-Blaster on localhost [USB-0]', --device=1, --instance=0, --go, --accept-bad-sysid, --sidp=0x1a820e0, /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf] return code: 2, no processors found
+
+!ENTRY com.altera.sbtgui.launch 4 0 2026-07-04 15:56:23.459
+!MESSAGE Downloading ELF Process failed
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 15:56:44.932
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 4 0 2026-07-04 15:56:47.114
+!MESSAGE Failed Executing: [nios2-download, '--cable=USB-Blaster on localhost [USB-0]', --device=1, --instance=0, --stop, --accept-bad-sysid, --sidp=0x1a820e0] return code: 2, no processors found
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 15:56:47.553
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 4 0 2026-07-04 15:56:49.964
+!MESSAGE Failed Executing: [nios2-download, '--cable=USB-Blaster on localhost [USB-0]', --device=1, --instance=0, --go, --accept-bad-sysid, --sidp=0x1a820e0, /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf] return code: 2, no processors found
+
+!ENTRY com.altera.sbtgui.launch 4 0 2026-07-04 15:56:49.965
+!MESSAGE Downloading ELF Process failed
+
+!ENTRY org.eclipse.core.jobs 2 2 2026-07-04 16:00:07.154
+!MESSAGE Job found still running after platform shutdown.  Jobs should be canceled by the plugin that scheduled them during shutdown: org.eclipse.debug.internal.ui.DebugUIPlugin$8
+!SESSION 2026-07-04 16:00:14.834 -----------------------------------------------
+eclipse.buildId=M20120208-0800
+java.version=1.6.0_23
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=win32, ARCH=x86, WS=win32, NL=pt_BR
+Framework arguments:  -product org.eclipse.epp.package.cpp.product -perspective com.altera.sbtgui.ui.cPerspective
+Command-line arguments:  -os win32 -ws win32 -arch x86 -product org.eclipse.epp.package.cpp.product -perspective com.altera.sbtgui.ui.cPerspective
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 16:00:48.504
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 16:00:50.296
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 16:53:26.687
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 16:53:28.991
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 17:16:00.243
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 17:16:02.002
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 17:22:07.727
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 17:22:09.824
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 17:26:41.305
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 17:26:43.433
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]

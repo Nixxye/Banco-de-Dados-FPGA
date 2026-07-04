@@ -24,6 +24,7 @@ add_fileset_file FIFO.vhd VHDL PATH ../../../../vhdl/FIFO.vhd
 add_fileset_file whereFilter.vhd VHDL PATH ../../../../vhdl/whereFilter.vhd
 add_fileset_file limit.vhd VHDL PATH ../../../../vhdl/limit.vhd
 add_fileset_file count.vhd VHDL PATH ../../../../vhdl/count.vhd
+add_fileset_file sum.vhd VHDL PATH ../../../../vhdl/sum.vhd
 add_fileset_file pipeline.vhd VHDL PATH ../../../../vhdl/pipeline.vhd
 add_fileset_file user_hw.v VERILOG PATH user_hw.v TOP_LEVEL_FILE
 

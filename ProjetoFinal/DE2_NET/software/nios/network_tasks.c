@@ -18,10 +18,10 @@
 #include "osport.h"
 
 #define HTTP_PORT 80
-#define DEFAULT_QUERY_LIMIT 8
+#define DEFAULT_QUERY_LIMIT 0
 #define MAX_RESPONSE_BODY_SIZE 8192
 #define TABLE_HEADER_BYTES (24 + (TABLE_MAX_COLUMNS * TABLE_CELL_SIZE))
-#define TABLE_FILE_SUFFIX ".tbl8"
+#define TABLE_FILE_SUFFIX ".tbl"
 
 #ifndef USER_HW_0_BASE
 #define USER_HW_0_BASE 0x00000000
@@ -33,11 +33,13 @@
 #define HW_REG_STATUS_OFFSET 12
 #define HW_REG_DATA_OUT_OFFSET 16
 #define HW_REG_ACCUMULATOR_OFFSET 20
+#define HW_REG_SUM_OFFSET 24
 
 #define HW_CONTROL_DIN_VALID 0x01
 #define HW_CONTROL_LOAD_INST 0x02
 #define HW_CONTROL_RD_OUT_FIFO 0x04
 #define HW_CONTROL_RST 0x08
+#define HW_CONTROL_INPUT_EOF 0x10
 
 #define HW_STATUS_OUT_FIFO_FULL 0x01
 #define HW_STATUS_OUT_FIFO_EMPTY 0x02
@@ -45,12 +47,18 @@
 #define HW_STATUS_IN_FIFO_EMPTY 0x08
 #define HW_STATUS_IN_FIFO_FULL 0x10
 
+static void hw_signal_eof(void)
+{
+    IOWR_32DIRECT(USER_HW_0_BASE, HW_REG_CONTROL_OFFSET, HW_CONTROL_INPUT_EOF);
+}
+
 #define QUERY_CAPTURE_BUFFER_SIZE \
     (QUERY_MAX_ROWS * TABLE_MAX_COLUMNS * TABLE_CELL_SIZE)
 
 #define QUERY_SELECT_MAX_LEN QUERY_SQL_MAX_LEN
 #define QUERY_WHERE_MAX_LEN QUERY_SQL_MAX_LEN
 
+#define HW_STALL_MAX_CYCLES 5000000
 
 #define MIN_ALT_U32(a, b) ((a) < (b) ? (a) : (b))
 
@@ -320,51 +328,77 @@ static void compile_and_send_instructions(const QueryRequest *request, const Tab
 {
     alt_u32 inst;
     
-    inst = (2UL << 28) | (request->limit & 0xFF);
-    hw_send_instruction(inst);
+    if (request->limit > 0) {
+        inst = (2UL << 28) | (request->limit & 0xFF);
+        hw_send_instruction(inst);
+    }
 
     if (request->where_clause[0] != '\0') {
-        char col_name[64] = {0};
-        char op_str[4] = {0};
-        int val = 0;
         char *ptr = (char*)request->where_clause;
-        
-        while (*ptr == ' ') ptr++;
-        
-        int i = 0;
-        while (*ptr != ' ' && *ptr != '=' && *ptr != '<' && *ptr != '>' && *ptr != '!' && *ptr != '\0' && i < 63) {
-            col_name[i++] = *ptr++;
-        }
-        col_name[i] = '\0';
-        
-        while (*ptr == ' ') ptr++;
-        
-        i = 0;
-        while ((*ptr == '=' || *ptr == '<' || *ptr == '>' || *ptr == '!') && i < 3) {
-            op_str[i++] = *ptr++;
-        }
-        op_str[i] = '\0';
-        
-        while (*ptr == ' ') ptr++;
-        
-        val = atoi(ptr);
-        
-        int col_idx = find_column_index(schema, col_name);
-        if (col_idx >= 0) {
-            int op_code = 0;
-            if (strcmp(op_str, "=") == 0 || strcmp(op_str, "==") == 0) op_code = 0;
-            else if (strcmp(op_str, "!=") == 0) op_code = 1;
-            else if (strcmp(op_str, "<") == 0) op_code = 2;
-            else if (strcmp(op_str, "<=") == 0) op_code = 3;
-            else if (strcmp(op_str, ">") == 0) op_code = 4;
-            else if (strcmp(op_str, ">=") == 0) op_code = 5;
+        while (*ptr != '\0') {
+            char col_name[64] = {0};
+            char op_str[4] = {0};
+            int val = 0;
             
-            inst = (1UL << 28) | ((col_idx & 0x3F) << 11) | ((val & 0xFF) << 3) | (op_code & 0x7);
-            hw_send_instruction(inst);
+            while (*ptr == ' ') ptr++;
+            if (*ptr == '\0') break;
+
+            if (ascii_strncasecmp_local(ptr, "AND ", 4) == 0) {
+                ptr += 4;
+                while (*ptr == ' ') ptr++;
+            }
+            
+            int i = 0;
+            while (*ptr != ' ' && *ptr != '=' && *ptr != '<' && *ptr != '>' && *ptr != '!' && *ptr != '\0' && i < 63) {
+                col_name[i++] = *ptr++;
+            }
+            col_name[i] = '\0';
+            
+            while (*ptr == ' ') ptr++;
+            
+            i = 0;
+            while ((*ptr == '=' || *ptr == '<' || *ptr == '>' || *ptr == '!') && i < 3) {
+                op_str[i++] = *ptr++;
+            }
+            op_str[i] = '\0';
+            
+            while (*ptr == ' ') ptr++;
+            
+            if (*ptr == '\'') {
+                ptr++;
+                val = *ptr;
+                ptr++;
+                if (*ptr == '\'') ptr++;
+            } else if (!isdigit((unsigned char)*ptr) && *ptr != '-' && *ptr != '+' && isalpha((unsigned char)*ptr)) {
+                val = *ptr;
+                while (*ptr != ' ' && *ptr != '\0') ptr++;
+            } else if (isdigit((unsigned char)*ptr) && (*(ptr+1) == ' ' || *(ptr+1) == '\0')) {
+                // Único dígito numérico é tratado como caractere ASCII para comparar com o arquivo .tbl
+                val = *ptr;
+                ptr++;
+            } else {
+                val = atoi(ptr);
+                while (*ptr != ' ' && *ptr != '\0') ptr++;
+            }
+            
+            int col_idx = find_column_index(schema, col_name);
+            if (col_idx >= 0) {
+                int op_code = 0;
+                if (strcmp(op_str, "=") == 0 || strcmp(op_str, "==") == 0) op_code = 0;
+                else if (strcmp(op_str, "!=") == 0) op_code = 1;
+                else if (strcmp(op_str, "<") == 0) op_code = 2;
+                else if (strcmp(op_str, "<=") == 0) op_code = 3;
+                else if (strcmp(op_str, ">") == 0) op_code = 4;
+                else if (strcmp(op_str, ">=") == 0) op_code = 5;
+                
+                inst = (1UL << 28) | ((col_idx & 0x3F) << 11) | ((val & 0xFF) << 3) | (op_code & 0x7);
+                hw_send_instruction(inst);
+            }
         }
     }
     
-    if (ascii_strncasecmp_local(request->select_list, "COUNT(", 6) == 0) {
+    if (ascii_strncasecmp_local(request->select_list, "COUNT(", 6) == 0)
+    {
         char col_name[64] = {0};
         char *ptr = (char*)request->select_list + 6;
         int i = 0;
@@ -373,9 +407,29 @@ static void compile_and_send_instructions(const QueryRequest *request, const Tab
         }
         col_name[i] = '\0';
         int col_idx = find_column_index(schema, col_name);
-        if (col_idx < 0) col_idx = 0;
-        inst = (3UL << 28) | (col_idx & 0x3F);
-        hw_send_instruction(inst);
+        if (col_idx >= 0)
+        {
+            // opcode: 0011 (COUNT), op: 000 (none), value: 00000000
+            alt_u32 inst = (0x3 << 28) | (col_idx & 0x3F);
+            hw_send_instruction(inst);
+        }
+    }
+    else if (ascii_strncasecmp_local(request->select_list, "SUM(", 4) == 0)
+    {
+        char col_name[64] = {0};
+        char *ptr = (char*)request->select_list + 4;
+        int i = 0;
+        while (*ptr != ')' && *ptr != '\0' && i < 63) {
+            col_name[i++] = *ptr++;
+        }
+        col_name[i] = '\0';
+        int col_idx = find_column_index(schema, col_name);
+        if (col_idx >= 0)
+        {
+            // opcode: 0100 (SUM), op: 000 (none), value: 00000000
+            alt_u32 inst = (0x4 << 28) | (col_idx & 0x3F);
+            hw_send_instruction(inst);
+        }
     }
 }
 
@@ -444,7 +498,11 @@ static int parse_request_body(const char *body, QueryRequest *request)
 
     if (request->limit > QUERY_MAX_ROWS)
     {
-        request->limit = QUERY_MAX_ROWS;
+        // COUNT and SUM shouldn't be capped by MAX_ROWS so they can aggregate the full table
+        if (strstr(request->sql, "COUNT(") == NULL && strstr(request->sql, "SUM(") == NULL)
+        {
+            request->limit = QUERY_MAX_ROWS;
+        }
     }
 
     if (request->limit == 0)
@@ -529,7 +587,7 @@ static int load_table_schema_from_buf(const unsigned char *buf,
         return 0;
     if (schema->column_count == 0 || schema->column_count > TABLE_MAX_COLUMNS)
         return 0;
-    if (schema->row_width != (schema->column_count * TABLE_CELL_SIZE))
+    if (schema->row_width != (TABLE_MAX_COLUMNS * TABLE_CELL_SIZE))
         return 0;
 
     for (index = 0; index < schema->column_count; index++)
@@ -609,6 +667,14 @@ static alt_u32 hw_read_status(void)
     return IORD_32DIRECT(USER_HW_0_BASE, HW_REG_STATUS_OFFSET);
 }
 
+static alt_u32 hw_read_data_out(void)
+{
+    // A FIFO VHDL do hardware tem latencia de 1 ciclo (não é FWFT).
+    // Portanto, devemos pulsar rd_out_fifo PRIMEIRO e ler o dado DEPOIS!
+    IOWR_32DIRECT(USER_HW_0_BASE, HW_REG_CONTROL_OFFSET, HW_CONTROL_RD_OUT_FIFO);
+    return IORD_32DIRECT(USER_HW_0_BASE, HW_REG_DATA_OUT_OFFSET);
+}
+
 static void hw_clear(void)
 {
     IOWR_32DIRECT(USER_HW_0_BASE, HW_REG_CONTROL_OFFSET, HW_CONTROL_RST);
@@ -643,9 +709,11 @@ static int drain_output_words(unsigned char *capture_buffer,
 
     while ((status & HW_STATUS_OUT_FIFO_EMPTY) == 0)
     {
-        alt_u32 word = IORD_32DIRECT(USER_HW_0_BASE, HW_REG_DATA_OUT_OFFSET);
-        
+        // 1. Pulsa a leitura para a FIFO atualizar o dout
         IOWR_32DIRECT(USER_HW_0_BASE, HW_REG_CONTROL_OFFSET, HW_CONTROL_RD_OUT_FIFO);
+        
+        // 2. Le o novo dado do dout
+        alt_u32 word = IORD_32DIRECT(USER_HW_0_BASE, HW_REG_DATA_OUT_OFFSET);
 
         if (*captured_size < capture_limit_bytes)
         {
@@ -751,6 +819,8 @@ static int feed_source_to_hardware(StreamSource *source,
         }
     }
 
+    hw_signal_eof();
+
     if (!wait_for_done)
     {
         return 1;
@@ -828,12 +898,55 @@ static int build_success_body(const char *mode,
     alt_u32 returned_rows = 0;
     int offset = 0;
 
+    if (ascii_strncasecmp_local(request->select_list, "COUNT(", 6) == 0)
+    {
+        alt_u32 acc_val = IORD_32DIRECT(USER_HW_0_BASE, HW_REG_ACCUMULATOR_OFFSET);
+        
+        offset += snprintf(http_response_body + offset,
+                           sizeof(http_response_body) - offset,
+                           "STATUS=OK\n"
+                           "MODE=%s\n"
+                           "TABLE=%s\n"
+                           "SQL=%s\n"
+                           "SCANNED_ROWS=%lu\n"
+                           "RETURNED_ROWS=1\n"
+                           "COLUMNS=COUNT\n"
+                           "ROW=%lu\n",
+                           mode,
+                           request->table,
+                           request->sql,
+                           (unsigned long)schema->row_count,
+                           (unsigned long)acc_val);
+        return 1;
+    }
+    else if (ascii_strncasecmp_local(request->select_list, "SUM(", 4) == 0)
+    {
+        alt_u32 sum_val = IORD_32DIRECT(USER_HW_0_BASE, HW_REG_SUM_OFFSET);
+        
+        offset += snprintf(http_response_body + offset,
+                           sizeof(http_response_body) - offset,
+                           "STATUS=OK\n"
+                           "MODE=%s\n"
+                           "TABLE=%s\n"
+                           "SQL=%s\n"
+                           "SCANNED_ROWS=%lu\n"
+                           "RETURNED_ROWS=1\n"
+                           "COLUMNS=SUM\n"
+                           "ROW=%lu\n",
+                           mode,
+                           request->table,
+                           request->sql,
+                           (unsigned long)schema->row_count,
+                           (unsigned long)sum_val);
+        return 1;
+    }
+
     if (schema->row_width != 0)
     {
         returned_rows = (alt_u32)(captured_size / (int)schema->row_width);
     }
 
-    if (returned_rows > request->limit)
+    if (request->limit > 0 && returned_rows > request->limit)
     {
         returned_rows = request->limit;
     }
@@ -964,7 +1077,7 @@ static void process_request(void)
                      sizeof(http_response_body),
                      &offset,
                      "Tabela '%s' nao encontrada no SD.\n"
-                     "Coloque '%s.tbl8' na raiz ou em /tables/ (FAT16).",
+                     "Coloque '%s.tbl' na raiz ou em /tables/ (FAT16).",
                      pending_request.table,
                      pending_request.table))
         {
@@ -976,7 +1089,8 @@ static void process_request(void)
         return;
     }
 
-    capture_limit_bytes = (int)(MIN_ALT_U32(pending_request.limit, schema.row_count) * schema.row_width);
+    alt_u32 effective_limit = (pending_request.limit > 0) ? pending_request.limit : schema.row_count;
+    capture_limit_bytes = (int)(MIN_ALT_U32(effective_limit, schema.row_count) * schema.row_width);
 
     if (capture_limit_bytes > (int)sizeof(captured_output_buffer))
     {
@@ -1033,16 +1147,7 @@ static void process_request(void)
     result_rows = captured_output_buffer;
     result_size = captured_size;
 
-    if ((result_size < (int)schema.row_width ||
-         !buffer_has_visible_data(result_rows, result_size)) &&
-        source.memory != NULL &&
-        source.memory_size >= schema.row_width)
-    {
-        printf("HW output vazio; usando payload bruto do SD para resposta HTTP.\n");
-        result_rows = source.memory;
-        result_size = (int)source.memory_size;
-        mode = "board-sdcard-raw";
-    }
+    // Fallback removido pois impedia queries vazias de retornarem adequadamente.
 
     if (!build_success_body(mode,
                             &pending_request,

@@ -18,6 +18,7 @@ module user_hw (
     localparam ADDR_STATUS       = 7'd3; // 0x0C
     localparam ADDR_DATA_OUT     = 7'd4; // 0x10
     localparam ADDR_ACCUMULATOR  = 7'd5; // 0x14
+    localparam ADDR_SUM          = 7'd6; // 0x18
 
     reg read_prev;
     reg write_prev;
@@ -62,6 +63,7 @@ module user_hw (
     reg load_inst;
     reg rd_out_fifo;
     reg sw_rst;
+    reg eof_ctrl;
     
     always @(posedge clk or posedge reset) begin
         if (reset) begin
@@ -69,12 +71,15 @@ module user_hw (
             load_inst <= 1'b0;
             rd_out_fifo <= 1'b0;
             sw_rst <= 1'b0;
+            eof_ctrl <= 1'b0;
         end else begin
             if (write_pulse && (address == ADDR_CONTROL)) begin
                 din_valid_ctrl <= writedata[0];
                 load_inst <= writedata[1];
                 rd_out_fifo <= writedata[2];
                 sw_rst <= writedata[3];
+                if (writedata[4]) eof_ctrl <= 1'b1;
+                if (writedata[3]) eof_ctrl <= 1'b0;
             end else begin
                 din_valid_ctrl <= 1'b0;
                 load_inst <= 1'b0;
@@ -91,7 +96,8 @@ module user_hw (
     wire [31:0] out_fifo_dout;
     wire out_fifo_empty;
     wire out_fifo_full;
-    wire [7:0] acc_out;
+    wire [31:0] acc_out;
+    wire [31:0] sum_out;
     wire done;
 
     pipeline #(
@@ -105,6 +111,7 @@ module user_hw (
         .rst(pipeline_rst),
         .din(data_in_reg),
         .din_valid(din_valid_ctrl),
+        .eof(eof_ctrl),
         .full(full),
         .empty(empty),
         .instruction(inst_reg),
@@ -114,6 +121,7 @@ module user_hw (
         .out_fifo_empty(out_fifo_empty),
         .out_fifo_full(out_fifo_full),
         .acc_out(acc_out),
+        .sum_out(sum_out),
         .in_fifo_count(),
         .out_fifo_count(),
         .done(done)
@@ -134,7 +142,10 @@ module user_hw (
                     readdata = out_fifo_dout;
                 end
                 ADDR_ACCUMULATOR: begin
-                    readdata = {24'd0, acc_out};
+                    readdata = acc_out;
+                end
+                ADDR_SUM: begin
+                    readdata = sum_out;
                 end
                 default: readdata = 32'd0;
             endcase

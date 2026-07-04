@@ -412,9 +412,9 @@
     function extractLimit(sql) {
         const match = sql.match(/\blimit\s+(\d+)/i);
         if (!match) {
-            return 8;
+            return 0;
         }
-        return Math.min(Math.max(Number(match[1]), 1), 16);
+        return Number(match[1]);
     }
 
     function extractSelectedColumns(sql, availableColumns) {

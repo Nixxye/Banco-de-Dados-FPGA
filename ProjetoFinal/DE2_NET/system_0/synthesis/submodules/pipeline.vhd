@@ -17,6 +17,7 @@ entity pipeline is
         -- Interface FIFO de Entrada
         din            : in  STD_LOGIC_VECTOR ((DATA_WIDTH * NUM_COLS)-1 downto 0);
         din_valid      : in  STD_LOGIC;
+        eof            : in  STD_LOGIC;
         full           : out STD_LOGIC;
         empty          : out STD_LOGIC;
         
@@ -31,7 +32,8 @@ entity pipeline is
         out_fifo_full  : out STD_LOGIC;
         
         -- Acumulador
-        acc_out        : out STD_LOGIC_VECTOR (DATA_WIDTH-1 downto 0);
+        acc_out        : out STD_LOGIC_VECTOR (31 downto 0);
+        sum_out        : out STD_LOGIC_VECTOR (31 downto 0);
         
         -- Contadores das FIFOs
         in_fifo_count  : out integer range 0 to FIFO_DEPTH;
@@ -72,7 +74,20 @@ architecture Behavioral of pipeline is
             clk   : in  STD_LOGIC;
             rst   : in  STD_LOGIC;
             din   : in  STD_LOGIC_VECTOR (DATA_WIDTH-1 downto 0);
-            dout  : out STD_LOGIC_VECTOR (DATA_WIDTH-1 downto 0);
+            dout  : out STD_LOGIC_VECTOR (31 downto 0);
+            valid : in  STD_LOGIC
+        );
+    end component;
+
+    component sum is
+        Generic (
+            DATA_WIDTH : integer := 8
+        );
+        Port (
+            clk   : in  STD_LOGIC;
+            rst   : in  STD_LOGIC;
+            din   : in  STD_LOGIC_VECTOR (DATA_WIDTH-1 downto 0);
+            dout  : out STD_LOGIC_VECTOR (31 downto 0);
             valid : in  STD_LOGIC
         );
     end component;
@@ -152,6 +167,7 @@ architecture Behavioral of pipeline is
     signal limit_active     : STD_LOGIC := '0';
     signal count_col_idx    : integer range 0 to NUM_COLS-1 := 0;
     signal count_active     : STD_LOGIC := '0';
+    signal sum_active       : STD_LOGIC := '0';
 
     -- Sinais de fluxo e status
     signal where_valid_and : STD_LOGIC;
@@ -165,7 +181,7 @@ begin
     empty <= fifo_empty;
     done <= stage3_done;
 
-    -- Trava a leitura da FIFO enquanto estiver carregando instrução ou se já terminou na fonte (ou limit travou)
+    -- Trava a leitura da FIFO enquanto estiver carregando instrução
     fifo_rd_en <= '1' when (load_inst = '0' and fifo_empty = '0' and limit_hit = '0') else '0';
 
     -- Instruction Fetcher Process
@@ -176,6 +192,7 @@ begin
             where_active_cnt <= 0;
             limit_active <= '0';
             count_active <= '0';
+            sum_active <= '0';
             for i in 0 to NUM_WHERE-1 loop
                 where_inst(i) <= (others => '0');
             end loop;
@@ -196,6 +213,9 @@ begin
                 elsif opcode = "0011" then -- COUNT
                     count_col_idx <= to_integer(unsigned(instruction(5 downto 0)));
                     count_active <= '1';
+                elsif opcode = "0100" then -- SUM
+                    count_col_idx <= to_integer(unsigned(instruction(5 downto 0)));
+                    sum_active <= '1';
                 end if;
             end if;
         end if;
@@ -269,7 +289,7 @@ begin
             rd_en_pipe1 <= fifo_rd_en;
             rd_en_pipe2 <= rd_en_pipe1;
             
-            if load_inst = '1' or fifo_empty = '1' then
+            if eof = '1' and fifo_empty = '1' then
                 stage1_done <= '1';
             else
                 stage1_done <= '0';
@@ -307,16 +327,22 @@ begin
     count_din <= limit_cols(count_col_idx);
 
     inst_count: count
-        Generic map (
-            DATA_WIDTH => DATA_WIDTH
-        )
-        Port map (
-            clk   => clk,
-            rst   => rst,
-            din   => count_din,
-            valid => count_valid_in,
-            dout  => count_dout
-        );
+    port map (
+        clk   => clk,
+        rst   => rst,
+        din   => count_din,
+        dout  => acc_out,
+        valid => count_valid_in
+    );
+
+    inst_sum: sum
+    port map (
+        clk   => clk,
+        rst   => rst,
+        din   => count_din,
+        dout  => sum_out,
+        valid => count_valid_in
+    );
 
     -- Configuração e Instância da FIFO de Saída recebendo dados do LIMIT
     -- O sinal limit_done_out garante o bloqueio imediato das escritas se o flush bater nesse estágio
@@ -355,6 +381,6 @@ begin
     end process;
 
     -- Saída do Pipeline (o resultado do Acumulador)
-    acc_out <= count_dout;
+    -- acc_out já é conectado diretamente no inst_count
 
 end Behavioral;

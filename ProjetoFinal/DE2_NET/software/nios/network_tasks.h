@@ -12,10 +12,10 @@
 #define QUERY_REQUEST_BUFFER_SIZE 1536
 #define QUERY_SQL_MAX_LEN 256
 #define QUERY_TABLE_MAX_LEN 32
-#define QUERY_MAX_ROWS 16
+#define QUERY_MAX_ROWS 256
 
-#define TABLE_MAX_COLUMNS 16
-#define TABLE_CELL_SIZE 8
+#define TABLE_MAX_COLUMNS 4
+#define TABLE_CELL_SIZE 1
 
 // Prototipos
 void init_network_tasks(void);
