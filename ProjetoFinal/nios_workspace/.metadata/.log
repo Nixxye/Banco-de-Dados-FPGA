@@ -302,3 +302,34 @@ Command-line arguments:  -os win32 -ws win32 -arch x86 -product org.eclipse.epp.
 
 !ENTRY com.altera.sbtgui.launch 1 0 2026-07-04 17:26:43.433
 !MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+!SESSION 2026-07-06 17:39:01.058 -----------------------------------------------
+eclipse.buildId=M20120208-0800
+java.version=1.6.0_23
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=win32, ARCH=x86, WS=win32, NL=pt_BR
+Framework arguments:  -product org.eclipse.epp.package.cpp.product -perspective com.altera.sbtgui.ui.cPerspective
+Command-line arguments:  -os win32 -ws win32 -arch x86 -product org.eclipse.epp.package.cpp.product -perspective com.altera.sbtgui.ui.cPerspective
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-06 17:43:22.829
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-06 17:43:25.177
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-06 18:07:59.411
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-06 18:08:01.175
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-06 18:24:08.655
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-06 18:24:10.434
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-06 18:42:33.766
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --stop --accept-bad-sysid --sidp=0x1a820e0]
+
+!ENTRY com.altera.sbtgui.launch 1 0 2026-07-06 18:42:35.893
+!MESSAGE Executing: [C:/altera/13.0sp1/quartus\bin\cygwin\bin\bash.exe, -c, nios2-download '--cable=USB-Blaster on localhost [USB-0]' --device=1 --instance=0 --go --accept-bad-sysid --sidp=0x1a820e0 /cygdrive/c/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios/nios.elf]

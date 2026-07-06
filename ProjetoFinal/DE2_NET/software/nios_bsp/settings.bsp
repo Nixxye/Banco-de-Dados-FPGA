@@ -2,8 +2,8 @@
 <sch:Settings xmlns:sch="http://www.altera.com/embeddedsw/bsp/schema">
         <BspType>ucosii</BspType>
         <BspVersion>default</BspVersion>
-        <BspGeneratedTimeStamp>04/07/2026 15:48:32</BspGeneratedTimeStamp>
-        <BspGeneratedUnixTimeStamp>1783190912571</BspGeneratedUnixTimeStamp>
+        <BspGeneratedTimeStamp>06/07/2026 17:40:26</BspGeneratedTimeStamp>
+        <BspGeneratedUnixTimeStamp>1783370426388</BspGeneratedUnixTimeStamp>
         <BspGeneratedLocation>C:\Users\cjean\Documents\Git\Logica-Final\ProjetoFinal\DE2_NET\software\nios_bsp</BspGeneratedLocation>
         <BspSettingsFile>settings.bsp</BspSettingsFile>
         <SopcDesignFile>..\..\system_0.sopcinfo</SopcDesignFile>
