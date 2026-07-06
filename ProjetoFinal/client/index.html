@@ -317,7 +317,7 @@
 
             <div class="field">
                 <label for="sql">SQL</label>
-                <textarea id="sql">SELECT id, nome, curso FROM alunos LIMIT 4</textarea>
+                <textarea id="sql">SELECT i, n, c FROM alunos LIMIT 4</textarea>
             </div>
 
             <div class="button-row">
@@ -582,7 +582,7 @@
     }
 
     fillExampleButton.addEventListener('click', () => {
-        sqlInput.value = 'SELECT sensor, valor FROM leituras LIMIT 3';
+        sqlInput.value = 'SELECT s, v FROM leituras LIMIT 3';
     });
 
     runQueryButton.addEventListener('click', executeQuery);

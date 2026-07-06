@@ -324,7 +324,7 @@ static int find_column_index(const TableSchema *schema, const char *col_name)
     return -1;
 }
 
-static void compile_and_send_instructions(const QueryRequest *request, const TableSchema *schema)
+static int compile_and_send_instructions(const QueryRequest *request, const TableSchema *schema, const StreamSource *source, char *err_msg)
 {
     alt_u32 inst;
     
@@ -335,6 +335,7 @@ static void compile_and_send_instructions(const QueryRequest *request, const Tab
 
     if (request->where_clause[0] != '\0') {
         char *ptr = (char*)request->where_clause;
+        int where_count = 0;
         while (*ptr != '\0') {
             char col_name[64] = {0};
             char op_str[4] = {0};
@@ -382,7 +383,10 @@ static void compile_and_send_instructions(const QueryRequest *request, const Tab
             }
             
             int col_idx = find_column_index(schema, col_name);
-            if (col_idx >= 0) {
+            if (col_idx < 0) {
+                snprintf(err_msg, 256, "Coluna do WHERE nao existe: %s", col_name);
+                return 0;
+            } else {
                 int op_code = 0;
                 if (strcmp(op_str, "=") == 0 || strcmp(op_str, "==") == 0) op_code = 0;
                 else if (strcmp(op_str, "!=") == 0) op_code = 1;
@@ -391,8 +395,14 @@ static void compile_and_send_instructions(const QueryRequest *request, const Tab
                 else if (strcmp(op_str, ">") == 0) op_code = 4;
                 else if (strcmp(op_str, ">=") == 0) op_code = 5;
                 
+                if (where_count >= 4) {
+                    snprintf(err_msg, 256, "O limite de condicoes WHERE concatenadas por AND e 4.");
+                    return 0;
+                }
+                
                 inst = (1UL << 28) | ((col_idx & 0x3F) << 11) | ((val & 0xFF) << 3) | (op_code & 0x7);
                 hw_send_instruction(inst);
+                where_count++;
             }
         }
     }
@@ -407,7 +417,12 @@ static void compile_and_send_instructions(const QueryRequest *request, const Tab
         }
         col_name[i] = '\0';
         int col_idx = find_column_index(schema, col_name);
-        if (col_idx >= 0)
+        if (col_idx < 0)
+        {
+            snprintf(err_msg, 256, "Coluna do COUNT nao existe: %s", col_name);
+            return 0;
+        }
+        else
         {
             // opcode: 0011 (COUNT), op: 000 (none), value: 00000000
             alt_u32 inst = (0x3 << 28) | (col_idx & 0x3F);
@@ -424,13 +439,50 @@ static void compile_and_send_instructions(const QueryRequest *request, const Tab
         }
         col_name[i] = '\0';
         int col_idx = find_column_index(schema, col_name);
-        if (col_idx >= 0)
+        if (col_idx < 0)
         {
+            snprintf(err_msg, 256, "Coluna do SUM nao existe: %s", col_name);
+            return 0;
+        }
+        else
+        {
+            if (source != NULL && source->memory != NULL && source->memory_size > source->memory_offset)
+            {
+                char val = source->memory[source->memory_offset + col_idx * 2];
+                if (val < '0' || val > '9')
+                {
+                    snprintf(err_msg, 256, "Nao e possivel somar a coluna '%s' pois ela contem texto (valor ascii: '%c')", col_name, val);
+                    return 0;
+                }
+            }
+
             // opcode: 0100 (SUM), op: 000 (none), value: 00000000
             alt_u32 inst = (0x4 << 28) | (col_idx & 0x3F);
             hw_send_instruction(inst);
         }
     }
+    else if (request->select_list[0] != '*')
+    {
+        char *ptr = (char*)request->select_list;
+        while (*ptr != '\0') {
+            char col_name[64] = {0};
+            int i = 0;
+            while (*ptr == ' ') ptr++;
+            while (*ptr != ',' && *ptr != ' ' && *ptr != '\0' && i < 63) {
+                col_name[i++] = *ptr++;
+            }
+            col_name[i] = '\0';
+            
+            if (i > 0) {
+                if (find_column_index(schema, col_name) < 0) {
+                    snprintf(err_msg, 256, "Coluna do SELECT nao existe: %s", col_name);
+                    return 0;
+                }
+            }
+            while (*ptr == ' ' || *ptr == ',') ptr++;
+        }
+    }
+    return 1;
 }
 
 static int extract_line_value(const char *body,
@@ -1071,21 +1123,22 @@ static void process_request(void)
     if (source.memory == NULL)
     {
         int offset = 0;
-
-        http_response_body[0] = '\0';
-        if (!appendf(http_response_body,
-                     sizeof(http_response_body),
+        char not_found_msg[256];
+        not_found_msg[0] = '\0';
+        
+        if (!appendf(not_found_msg,
+                     sizeof(not_found_msg),
                      &offset,
                      "Tabela '%s' nao encontrada no SD.\n"
                      "Coloque '%s.tbl' na raiz ou em /tables/ (FAT16).",
                      pending_request.table,
                      pending_request.table))
         {
-            strcpy(http_response_body, "Tabela nao encontrada no SD.");
+            strcpy(not_found_msg, "Tabela nao encontrada no SD.");
         }
 
         send_error_response(current_client_socket, 404, "Not Found",
-                            http_response_body);
+                            not_found_msg);
         return;
     }
 
@@ -1099,7 +1152,12 @@ static void process_request(void)
 
     hw_clear();
     
-    compile_and_send_instructions(&pending_request, &schema);
+    char compile_err[256] = {0};
+    if (!compile_and_send_instructions(&pending_request, &schema, &source, compile_err)) {
+        send_error_response(current_client_socket, 400, "Bad Request", compile_err);
+        if (source.file) fclose(source.file);
+        return;
+    }
 
     printf("HW feed: rows=%lu row_width=%lu total_bytes=%lu limit=%lu\n",
            (unsigned long)schema.row_count,

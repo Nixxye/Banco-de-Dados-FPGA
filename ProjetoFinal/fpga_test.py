@@ -47,7 +47,7 @@ def evaluate_row(row_dict, conditions):
             if cv > vv: return False
     return True
 
-def run_query(sql, host):
+def run_query(sql, host, expect_error=False):
     url = f"http://{host}:80/query"
     print(f"\n{'-'*60}")
     print(f"Executando: {sql}")
@@ -120,6 +120,7 @@ def run_query(sql, host):
                 print("\nResposta da Placa:")
                 print(result.strip())
                 
+                test_passed = False
                 if gabarito_found:
                     print("\n--- VERIFICACAO DO GABARITO ---")
                     lines = result.strip().split('\n')
@@ -129,12 +130,15 @@ def run_query(sql, host):
                         fpga_val = fpga_lines[0].split("=")[1] if fpga_lines else "N/A"
                         if gabarito_expected_val == fpga_val:
                             print(f"[PASS] Agregador perfeito! Esperado: {gabarito_expected_val}, Hardware: {fpga_val}")
+                            test_passed = True
                         else:
                             print(f"[FAIL] Agregador erro! Esperado: {gabarito_expected_val}, Hardware: {fpga_val}")
+                            test_passed = False
                     else:
                         fpga_contents = [fl.split("=", 1)[1] for fl in fpga_lines if "=" in fl]
                         if len(gabarito_rows) != len(fpga_contents):
                             print(f"[FAIL] Quantidade de linhas difere! Esperado: {len(gabarito_rows)}, Hardware: {len(fpga_contents)}")
+                            test_passed = False
                         else:
                             failed = False
                             for i, (exp, fpg) in enumerate(zip(gabarito_rows, fpga_contents)):
@@ -142,22 +146,34 @@ def run_query(sql, host):
                                     print(f"[FAIL] Linha divergente! Esp: {exp} | Hw: {fpg}")
                                     failed = True
                             if not failed:
-                                print(f"[PASS] {len(gabarito_rows)} linhas processadas de forma IDENTICA ao Gabarito Python!")
+                                if expect_error:
+                                    print("[FAIL] A query deveria ter retornado erro (Negative Test), mas a placa aceitou!")
+                                    test_passed = False
+                                else:
+                                    print(f"[PASS] {len(gabarito_rows)} linhas processadas de forma IDENTICA ao Gabarito Python!")
+                                    test_passed = True
+                            else:
+                                test_passed = False
 
                 time.sleep(0.5)
-                return
+                return test_passed
         except urllib.error.HTTPError as e:
             if e.code == 503:
                 print(f"Placa ocupada (503). Tentativa {attempt+1}/3. Aguardando 1s...")
                 time.sleep(1)
             else:
-                print(f"Erro HTTP {e.code}: {e.reason}")
-                time.sleep(0.5)
-                return
+                if expect_error and (e.code == 400 or e.code == 404 or e.code == 500):
+                    err_body = e.read().decode('utf-8', errors='ignore')
+                    print(f"\n[PASS] Erro corretamente barrado pela placa (Negative Test)!\nPlaca Respondeu ({e.code}):\n{err_body.strip()}")
+                    return True
+                else:
+                    print(f"Erro HTTP {e.code}: {e.reason}")
+                    time.sleep(0.5)
+                    return False
         except Exception as e:
             print(f"Erro na requisicao para {url}: {e}")
             time.sleep(0.5)
-            return
+            return False
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Script de testes automatizados para a FPGA.")
@@ -196,12 +212,31 @@ if __name__ == "__main__":
         "SELECT SUM(v) FROM leituras WHERE s = T",
         "SELECT SUM(q) FROM produtos WHERE t = B",
         "SELECT SUM(v) FROM vendas WHERE c = A",
+        
+        # Testes Negativos
+        ("SELECT * FROM alunos WHERE coluna_fantasma = 1", True),
+        ("SELECT coluna_imaginaria FROM alunos", True),
+        ("SELECT i, coluna_imaginaria FROM alunos", True),
+        ("SELECT SUM(n) FROM alunos", True),
+        ("SELECT * FROM tabela_fantasma", True),
+        ("SELECT COUNT(x) FROM alunos", True),
     ]
 
     print(f"Iniciando Bateria de {len(TEST_QUERIES)} Testes na placa {args.ip} ...\n")
     
+    passed_count = 0
+    failed_count = 0
+
     for sql in TEST_QUERIES:
-        run_query(sql, args.ip)
+        if isinstance(sql, tuple):
+            query, expect_err = sql
+        else:
+            query, expect_err = sql, False
+            
+        if run_query(query, args.ip, expect_error=expect_err):
+            passed_count += 1
+        else:
+            failed_count += 1
         
     print("\n" + "-"*60)
-    print("Testes finalizados!")
+    print(f"Testes finalizados! Passaram: {passed_count} | Falharam: {failed_count}")
