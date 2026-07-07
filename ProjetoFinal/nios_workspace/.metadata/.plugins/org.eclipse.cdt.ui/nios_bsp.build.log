@@ -2,11 +2,11 @@
 **** Build of configuration Nios II for project nios_bsp ****
 
 make all 
-      1 [main] pwd 17380 find_fast_cwd: WARNING: Couldn't compute FAST_CWD pointer.  Please report this problem to
+      3 [main] pwd 10532 find_fast_cwd: WARNING: Couldn't compute FAST_CWD pointer.  Please report this problem to
 the public mailing list cygwin@cygwin.com
-      1 [main] sh 6884 find_fast_cwd: WARNING: Couldn't compute FAST_CWD pointer.  Please report this problem to
+      3 [main] sh 8596 find_fast_cwd: WARNING: Couldn't compute FAST_CWD pointer.  Please report this problem to
 the public mailing list cygwin@cygwin.com
-      1 [main] sh 8664 find_fast_cwd: WARNING: Couldn't compute FAST_CWD pointer.  Please report this problem to
+      3 [main] sh 7300 find_fast_cwd: WARNING: Couldn't compute FAST_CWD pointer.  Please report this problem to
 the public mailing list cygwin@cygwin.com
 [BSP build complete]
 

@@ -448,7 +448,7 @@ static int compile_and_send_instructions(const QueryRequest *request, const Tabl
         {
             if (source != NULL && source->memory != NULL && source->memory_size > source->memory_offset)
             {
-                char val = source->memory[source->memory_offset + col_idx * 2];
+                char val = source->memory[source->memory_offset + col_idx * TABLE_CELL_SIZE];
                 if (val < '0' || val > '9')
                 {
                     snprintf(err_msg, 256, "Nao e possivel somar a coluna '%s' pois ela contem texto (valor ascii: '%c')", col_name, val);

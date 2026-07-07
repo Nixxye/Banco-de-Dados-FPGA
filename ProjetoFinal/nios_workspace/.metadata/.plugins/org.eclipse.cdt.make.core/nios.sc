@@ -4,6 +4,14 @@
 <scannerInfo id="org.eclipse.cdt.make.core.discoveredScannerInfo">
 <instance id="preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.458657937;preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.458657937.;cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.base.1822897920;cdt.managedbuild.tool.gnu.cpp.compiler.input.cygwin.336228596">
 <collector id="org.eclipse.cdt.make.core.PerProjectSICollector">
+<includePath path="C:/Users/Nixinho/Documents/codes/Banco-de-Dados-FPGA/ProjetoFinal/DE2_NET/software/nios_bsp/iniche/inc"/>
+<includePath path="C:/Users/Nixinho/Documents/codes/Banco-de-Dados-FPGA/ProjetoFinal/DE2_NET/software/nios_bsp/iniche/src/h"/>
+<includePath path="C:/Users/Nixinho/Documents/codes/Banco-de-Dados-FPGA/ProjetoFinal/DE2_NET/software/nios_bsp/iniche/src/h/nios2"/>
+<includePath path="C:/Users/Nixinho/Documents/codes/Banco-de-Dados-FPGA/ProjetoFinal/DE2_NET/software/nios_bsp/iniche/src/nios2"/>
+<includePath path="C:/Users/Nixinho/Documents/codes/Banco-de-Dados-FPGA/ProjetoFinal/DE2_NET/software/nios_bsp/UCOSII/inc"/>
+<includePath path="C:/Users/Nixinho/Documents/codes/Banco-de-Dados-FPGA/ProjetoFinal/DE2_NET/software/nios_bsp/HAL/inc"/>
+<includePath path="C:/Users/Nixinho/Documents/codes/Banco-de-Dados-FPGA/ProjetoFinal/DE2_NET/software/nios_bsp/"/>
+<includePath path="C:/Users/Nixinho/Documents/codes/Banco-de-Dados-FPGA/ProjetoFinal/DE2_NET/software/nios_bsp/drivers/inc"/>
 <includePath path="C:/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios_bsp/iniche/inc"/>
 <includePath path="C:/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios_bsp/iniche/src/h"/>
 <includePath path="C:/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios_bsp/iniche/src/h/nios2"/>
@@ -239,6 +247,14 @@
 </instance>
 <instance id="preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.458657937;preference.org.eclipse.cdt.managedbuilder.core.configurationDataProvider.458657937.;cdt.managedbuild.tool.gnu.c.compiler.cygwin.base.1227674077;cdt.managedbuild.tool.gnu.c.compiler.input.cygwin.2030276806">
 <collector id="org.eclipse.cdt.make.core.PerProjectSICollector">
+<includePath path="C:/Users/Nixinho/Documents/codes/Banco-de-Dados-FPGA/ProjetoFinal/DE2_NET/software/nios_bsp/iniche/inc"/>
+<includePath path="C:/Users/Nixinho/Documents/codes/Banco-de-Dados-FPGA/ProjetoFinal/DE2_NET/software/nios_bsp/iniche/src/h"/>
+<includePath path="C:/Users/Nixinho/Documents/codes/Banco-de-Dados-FPGA/ProjetoFinal/DE2_NET/software/nios_bsp/iniche/src/h/nios2"/>
+<includePath path="C:/Users/Nixinho/Documents/codes/Banco-de-Dados-FPGA/ProjetoFinal/DE2_NET/software/nios_bsp/iniche/src/nios2"/>
+<includePath path="C:/Users/Nixinho/Documents/codes/Banco-de-Dados-FPGA/ProjetoFinal/DE2_NET/software/nios_bsp/UCOSII/inc"/>
+<includePath path="C:/Users/Nixinho/Documents/codes/Banco-de-Dados-FPGA/ProjetoFinal/DE2_NET/software/nios_bsp/HAL/inc"/>
+<includePath path="C:/Users/Nixinho/Documents/codes/Banco-de-Dados-FPGA/ProjetoFinal/DE2_NET/software/nios_bsp/"/>
+<includePath path="C:/Users/Nixinho/Documents/codes/Banco-de-Dados-FPGA/ProjetoFinal/DE2_NET/software/nios_bsp/drivers/inc"/>
 <includePath path="C:/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios_bsp/iniche/inc"/>
 <includePath path="C:/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios_bsp/iniche/src/h"/>
 <includePath path="C:/Users/cjean/Documents/Git/Logica-Final/ProjetoFinal/DE2_NET/software/nios_bsp/iniche/src/h/nios2"/>
