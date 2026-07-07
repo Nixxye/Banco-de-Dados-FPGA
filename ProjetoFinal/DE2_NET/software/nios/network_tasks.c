@@ -324,6 +324,13 @@ static int find_column_index(const TableSchema *schema, const char *col_name)
     return -1;
 }
 
+// ==============================================================================
+// ETAPA 2 DO FLUXO: A "COMPILACAO" DO SQL (SOFTWARE -> HARDWARE)
+// ==============================================================================
+// Esta funcao fatiou a string "WHERE" ou de Agregacao, identifica a coluna,
+// o operador matematico e monta o Opcode 32-bits denso de instrucao.
+// Em seguida, usa hw_send_instruction (que envelopa o IOWR_32DIRECT da biblioteca)
+// para enviar pela malha Avalon ate o registrador do VHDL (pipeline.vhd).
 static int compile_and_send_instructions(const QueryRequest *request, const TableSchema *schema, const StreamSource *source, char *err_msg)
 {
     alt_u32 inst;
@@ -826,6 +833,13 @@ static int buffer_has_visible_data(const unsigned char *data, int byte_count)
     return 0;
 }
 
+// ==============================================================================
+// ETAPA 3 DO FLUXO: A CARGA DE DADOS (SD CARD -> FIFO DO HARDWARE)
+// ==============================================================================
+// Esta funcao varre a origem (Cartao SD em FAT16) em pedacos iterativos e
+// alimenta o barramento do modulo VHDL. O laco while lê fatias de 32 bytes 
+// e, caso a flag STATUS_FULL_BIT permita, envia fisicamente o array de bytes 
+// ao hardware customizado usando IOWR_32DIRECT.
 static int feed_source_to_hardware(StreamSource *source,
                                    alt_u32 total_bytes,
                                    int wait_for_done,
@@ -939,6 +953,13 @@ static void cell_to_text(char *dst, int dst_size, const unsigned char *src)
     dst[end] = '\0';
 }
 
+// ==============================================================================
+// ETAPA 5 DO FLUXO: O RETORNO (DRENAGEM E RESPOSTA HTTP)
+// ==============================================================================
+// Enquanto feed_source_to_hardware insere os dados, esta funcao le o HW_REG_STATUS_OFFSET
+// via IORD_32DIRECT verificando se o hardware VHDL avaliou "Pronto".
+// Caso positivo, lemos o acumulador ou as linhas da FIFO de saida que passaram nos 
+// filtros fisicos, remontamos na resposta HTTP e a geramos (200 OK).
 static int build_success_body(const char *mode,
                               const QueryRequest *request,
                               const TableSchema *schema,
@@ -1094,6 +1115,12 @@ static int build_success_body(const char *mode,
     return 1;
 }
 
+// ==============================================================================
+// ORQUESTRACAO: process_request
+// ==============================================================================
+// Trata o request da camada de sockets. Esvazia o buffer rx_request_buffer,
+// delega o SQL para as instrucoes, invoca a transferencia SD->HW (feed_source)
+// e devolve a resposta montada pela TCP/IP.
 static void process_request(void)
 {
     TableSchema schema;
@@ -1248,6 +1275,12 @@ void init_network_tasks(void)
                     0);
 }
 
+// ==============================================================================
+// ETAPA 1 DO FLUXO: A CHEGADA DA REQUISICAO (REDE)
+// ==============================================================================
+// Task fundamental do MicroC/OS-II. O chip DM9000A intercepta o pacote de rede,
+// o SO monta a conexao (NicheStack TCP/IP), e caimos nesta thread de recepcao
+// socket onde a string crua e' capturada para o buffer interno.
 void rx_task(void *pdata)
 {
     int server_fd, client_fd;
