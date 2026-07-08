@@ -55,20 +55,43 @@ Mapeamento de armazenamento / uso
    - tcpserver.py simula a interface HTTP.
    - table_format.py define e le o formato .tbl8 usado pelos testes.
 
-Como reconstruir do zero
+Como Compilar e Rodar o Projeto do Zero (Build Guide)
 
-1. Instale Quartus Prime e Nios II EDS compativeis com a versao do projeto.
-2. Abra DE2_NET/DE2_NET.qpf no Quartus Prime.
-3. Se necessario, regenere o sistema em DE2_NET/system_0.qsys no Platform Designer.
-4. Execute a compilacao completa do hardware no Quartus.
-5. Programe a FPGA com DE2_NET/DE2_NET_time_limited.sof.
-6. Abra o Nios II Software Build Tools for Eclipse.
-7. Importe os projetos DE2_NET/software/nios e DE2_NET/software/nios_bsp.
-8. Se o system_0.qsys tiver sido regenerado, regenere também o BSP.
-9. Faça o build dos projetos de software.
-10. Baixe o executável do projeto nios para o hardware Nios II da placa.
-11. Copie os arquivos .tbl8 para o SD card.
-12. Conecte a placa à rede Ethernet e aguarde a inicialização do firmware.
+--- Parte 1: Hardware (Quartus Prime) ---
+Passo 1: Abra o Quartus Prime e carregue o projeto DE2_NET.qpf localizado na pasta ProjetoFinal/.
+Passo 2: No menu superior, va em Processing > Start Compilation. Aguarde a sintese completa do hardware VHDL.
+Passo 3: Conecte a placa DE2-115 via cabo USB e ligue-a.
+Passo 4: Abra o Programmer (Tools > Programmer), certifique-se de que o Hardware Setup esta como "USB-Blaster", selecione o arquivo gerado DE2_NET_time_limited.sof e clique em Start.
+
+--- Parte 2: Software (Nios II Eclipse) ---
+Passo 5: Abra o Nios II Software Build Tools for Eclipse e selecione a pasta nios_workspace/ como seu workspace.
+Passo 6: Se os projetos nao estiverem visiveis, va em File > Import > Nios II Software Build Tools Project e importe as pastas DE2_NET/software/nios e DE2_NET/software/nios_bsp.
+Passo 7: Clique com o botao direito no projeto nios_bsp > Nios II > Generate BSP.
+Passo 8: Selecione o projeto nios e aperte Ctrl+B (Build Project).
+Passo 9: Com a compilacao finalizada sem erros, clique com o botao direito no projeto nios > Run As > Nios II Hardware. Anote o Endereco de IP exibido no Console.
+
+--- Parte 3: Cliente Web (Frontend HTML) ---
+Passo 10: Navegue ate a pasta client/.
+Passo 11: Abra o arquivo index.html no navegador web.
+Passo 12: Insira o Endereco de IP que apareceu no passo 9 (ex: 192.168.0.x:80).
+Passo 13: Digite sua consulta SQL e clique em Executar Query.
+
+--- Solucao de Problemas e Erros Comuns ---
+* Erro: "Project nios_bsp is out of date" ou Falha no Build do Eclipse
+  - Causa: O Eclipse perdeu a referencia dos caminhos.
+  - Solucao: Botao direito no nios_bsp, Nios II > Generate BSP. Depois Clean Project em ambos e recompile.
+
+* Erro: Quartus Programmer diz "Failed" ao tentar enviar o .sof
+  - Causa: Placa desligada, cabo solto, ou drivers do USB-Blaster nao instalados.
+  - Solucao: Verifique o Gerenciador de Dispositivos e instale o driver apontando para a pasta C:\intelFPGA\...\quartus\drivers.
+
+* Erro: Nios Console exibe "Error: SD Card not found"
+  - Causa: Cartao SD nao encaixado ou nao formatado corretamente.
+  - Solucao: O cartao SD deve estar em FAT16. O arquivo .tbl deve estar na raiz. Insira o cartao antes de rodar o codigo C.
+
+* Erro de Conexao na Pagina Web (CORS ou Timeout)
+  - Causa: IP digitado errado ou Nios travado.
+  - Solucao: Verifique no Console do Eclipse se pegou IP valido e se ha resposta de ping.
 
 Como usar
 
@@ -89,3 +112,4 @@ Notas de integracao
 5. O firmware usa uC/OS-II e NicheStack, nao pthreads.
 
 Se houver necessidade de contextualizar o objetivo final em linguagem de entrega, complete manualmente os trechos marcados com [ENTRE COLCHETES] apenas se quiser reforcar o enunciado original.
+
