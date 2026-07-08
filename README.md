@@ -15,12 +15,12 @@ O sistema recebe consultas via TCP/IP na placa DE-2, carrega tabelas .tbl8 do SD
 * DE2_NET/DE2_NET.v
 * DE2_NET/system_0_inst.v
 * DE2_NET/ip/user_hw/user_hw.v
-* hdl/FIFO.vhd
-* hdl/whereFilter.vhd
-* hdl/limit.vhd
-* hdl/count.vhd
-* hdl/sum.vhd
-* hdl/pipeline.vhd
+* vhdl/FIFO.vhd
+* vhdl/whereFilter.vhd
+* vhdl/limit.vhd
+* vhdl/count.vhd
+* vhdl/sum.vhd
+* vhdl/pipeline.vhd
 
 ### 2. Software embarcado
 * DE2_NET/software/nios/main.c
