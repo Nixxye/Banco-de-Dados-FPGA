@@ -89,7 +89,7 @@ ios_bsp, *Nios II > Generate BSP*. Depois Clean Project em ambos e recompile.
 
 **Erro: Quartus Programmer diz "Failed" ao tentar enviar o .sof**
 * **Causa:** Placa desligada, cabo solto, ou drivers do USB-Blaster nao instalados.
-* **Solução:** Verifique o Gerenciador de Dispositivos e instale o driver apontando para a pasta C:\intelFPGA\...\quartus\drivers.
+* **SoluÃ§Ã£o:** Verifique o Gerenciador de Dispositivos e instale o driver apontando para a pasta C:\intelFPGA\...\quartus\drivers.
 
 **Erro: Nios Console exibe "Error: SD Card not found"**
 * **Causa:** Cartao SD nao encaixado ou nao formatado corretamente.
@@ -117,4 +117,3 @@ ios_bsp, *Nios II > Generate BSP*. Depois Clean Project em ambos e recompile.
 4. O SD e acessado via SPI bit-bang.
 5. O firmware usa uC/OS-II e NicheStack, nao pthreads.
 
-Se houver necessidade de contextualizar o objetivo final em linguagem de entrega, complete manualmente os trechos marcados com [ENTRE COLCHETES] apenas se quiser reforcar o enunciado original.
